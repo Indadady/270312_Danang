@@ -1,0 +1,2424 @@
+﻿<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JLH9GD9SVR"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-JLH9GD9SVR');
+    </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>다낭·호이안 5박 6일 · 투어메이커 스마트 가이드북</title>
+    <meta name="description" content="2027.03.12~03.17 다낭·호이안 5박 6일 스마트 가이드북 안내 초안 (TM-270312-DANANG)">
+    <meta name="tm-publish" content="pai-manual-with-tourmaker">
+    <meta name="tm-copyright" content="C-2026-059022">
+    <!-- TM-IP-REG:C-2026-059022 | TourMaker Smart Guidebook | Unauthorized reproduction prohibited -->
+    <meta property="og:title" content="다낭·호이안 5박 6일 가이드북">
+    <meta property="og:description" content="2027.03.12~17 · 썬푸꾸옥항공 9G0421/9G0420 · 5박 6일 일정 안내 초안">
+    <meta property="og:image" content="https://indadady.github.io/270312_Danang/assets/images/og-thumb.jpg">
+    <meta property="og:image:width" content="1920">
+    <meta property="og:image:height" content="1272">
+    <meta property="og:image:alt" content="바나힐 황금손다리 — 다낭 대표 랜드마크">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{tm:'#004098', 'tm-dark':'#002d6b'}}}}</script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <style>
+        :root { --tm: #004098; --tm-dark: #002d6b; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: #f8fafc; color: #1e293b; word-break: keep-all; }
+
+        .hero-bg {
+            background: linear-gradient(rgba(15, 23, 42, 0.35), rgba(0, 64, 152, 0.72)), url('assets/images/hero.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        @media(max-width:768px) { .hero-bg { background-attachment: scroll; } }
+
+        #map-wrap { position: relative; z-index: 0; }
+        #map { height: 420px; width: 100%; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,.1); z-index: 10; }
+        @media(min-width:1024px) { #map { height: 540px; } }
+        .leaflet-maplibre-gl { z-index: 0 !important; }
+        .leaflet-control-zoom { display: none !important; }
+        #map-distance {
+            position: absolute; top: 12px; right: 12px; z-index: 450;
+            min-width: 8rem; max-width: min(54vw, 14rem); text-align: right;
+            background: rgba(255,255,255,.94); backdrop-filter: blur(8px);
+            border-radius: 14px; padding: 10px 12px;
+            box-shadow: 0 8px 24px rgba(15,23,42,.14); border: 1px solid rgba(148,163,184,.35);
+            pointer-events: none;
+        }
+        @media (max-width: 380px) {
+            #map-distance { min-width: 7rem; padding: 8px 10px; }
+        }
+        #map-distance-time { white-space: pre-line; }
+        .map-zoom-btns {
+            position: absolute; left: 12px; bottom: 14px; z-index: 450;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .map-zoom-btns button {
+            width: 40px; height: 40px; border-radius: 12px; border: 1px solid #cbd5e1;
+            background: rgba(255,255,255,.96); color: #0f172a; font-size: 18px; font-weight: 800;
+            box-shadow: 0 4px 14px rgba(15,23,42,.12);
+        }
+        .map-zoom-btns button:active { transform: scale(.96); }
+        .custom-icon { background: transparent; border: none; }
+        #map, #map .leaflet-marker-icon { -webkit-tap-highlight-color: transparent; }
+        #map .leaflet-marker-icon:focus, #map .leaflet-marker-icon:focus-visible { outline: none !important; }
+        .map-pin-wrap { display: flex; flex-direction: column; align-items: center; }
+        .map-pin-dot {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #fff;
+            border: 2px solid rgba(255,255,255,0.95);
+            box-shadow: 0 8px 16px rgba(15,23,42,0.18);
+        }
+        .map-pin-label {
+            margin-top: 3px; background: rgba(255,255,255,0.96); color: #0f172a;
+            font-size: 10px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.2;
+            padding: 2px 6px; border-radius: 6px; white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(15,23,42,0.12);
+        }
+        .map-bus {
+            font-size: 22px; line-height: 1;
+            filter: drop-shadow(0 4px 8px rgba(15,23,42,0.35));
+            transform-origin: center center; display: inline-block;
+        }
+        body.event-day section { scroll-margin-top: 112px; }
+        @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        .leaflet-tooltip { font-family: 'Noto Sans KR', sans-serif !important; font-weight: 700 !important; color: #1e293b !important; border-radius: 8px !important; border: none !important; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1) !important; padding: 4px 10px !important; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in-up { animation: fadeInUp .8s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes lockShake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+        .shake { animation: lockShake .45s ease-in-out; }
+        body.tm-secure-select { -webkit-user-select: none; user-select: none; }
+        body.tm-secure-select input, body.tm-secure-select textarea { -webkit-user-select: text; user-select: text; }
+        section { scroll-margin-top: 70px; }
+
+        .timeline-dot { position: absolute; left: -25px; top: 4px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--tw-ring-color); background-color: var(--tw-bg-color); }
+        @media(max-width:1023px) { .timeline-dot { left: -20px; top: 6px; width: 14px; height: 14px; border-width: 2px; } }
+        .schedule-media { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+        @media(min-width:768px) { .schedule-media { flex-direction: row; align-items: flex-start; gap: 1rem; } .schedule-media .schedule-desc { flex: 1; min-width: 0; } }
+        .schedule-thumb { display: block; width: 100%; max-width: 12rem; aspect-ratio: 4/3; object-fit: cover; border-radius: 0.75rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(15,23,42,.08); flex-shrink: 0; }
+
+        .contact-row { display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12); border-radius: 0.75rem; padding: 0.875rem 1rem; }
+        .contact-badge { flex-shrink: 0; width: 3rem; text-align: center; font-size: 0.65rem; font-weight: 800; background: rgba(0,64,152,.25); color: #93c5fd; padding: 0.35rem 0.25rem; border-radius: 0.5rem; }
+
+        @media screen { #print-area { display: none !important; } }
+        @media print {
+            @page { size: A4 portrait; margin: 12mm 15mm; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            html, body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; font-family: 'Noto Sans KR', sans-serif; }
+            header, footer, section:not(#print-area), .no-print, #toast, #custom-confirm, #phrase-modal, #event-day-bar, #guidebook-lock-modal { display: none !important; }
+            main, body { padding: 0 !important; margin: 0 !important; width: 100% !important; background: #fff !important; }
+
+            #print-area { display: block !important; width: 100%; box-sizing: border-box; }
+            .print-page-2 { page-break-before: always; break-before: page; }
+            .print-header-top { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--tm); padding-bottom: 6px; margin-bottom: 12px; }
+            .print-header-top img { height: 26px; }
+            .print-doc-no { font-size: 9px; color: #555; font-weight: bold; }
+
+            .print-title { text-align: center; font-size: 20px; font-weight: 900; color: var(--tm); margin-bottom: 4px; line-height: 1.4; letter-spacing: -0.03em; }
+            .print-subtitle { text-align: center; font-size: 10px; color: #475569; margin: 0 0 10px 0; font-weight: 500; }
+
+            .print-overview { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; background: #f8fafc !important; border: 1px solid #cbd5e1 !important; border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; font-size: 10.5px; }
+            .print-overview .label { font-weight: 800; color: var(--tm); margin-right: 4px; }
+
+            .tm-table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; border: 1.5px solid #1e293b !important; }
+            .tm-table th { border: 1px solid #1e293b !important; background: #f1f5f9 !important; font-weight: bold; text-align: center; padding: 6px 4px !important; font-size: 10.5px; color: var(--tm); }
+            .tm-table td { border: 1px solid #1e293b !important; padding: 8px 10px !important; vertical-align: top; word-break: keep-all; line-height: 1.45; font-size: 10px; }
+            .tm-table tbody tr { page-break-inside: avoid; break-inside: avoid; }
+
+            .tm-col-date { width: 11%; text-align: center; font-weight: 700; background: #f8fafc !important; vertical-align: middle; line-height: 1.5; }
+            .tm-col-desc { width: 75%; }
+            .tm-col-meal { width: 14%; text-align: center; vertical-align: middle; }
+
+            .tm-day-divider td { border-top: 1.5px solid #1e293b !important; }
+            .tm-time-flow { font-size: 10px !important; margin-bottom: 5px !important; font-weight: bold; }
+            .tm-time-tag { color: var(--tm); margin-right: 4px; }
+            .tm-highlight { font-weight: 700; color: var(--tm); }
+
+            .tm-desc-list { list-style: none; margin: 4px 0 !important; padding-left: 2px; }
+            .tm-desc-list li { position: relative; padding-left: 10px; margin-bottom: 4px !important; }
+            .tm-desc-list li::before { content: '■'; font-size: 7px; position: absolute; left: 0; top: 3.5px; color: var(--tm); }
+
+            .tm-hotel-divider { border: 0; border-top: 1px dashed #94a3b8; margin: 6px 0 4px 0; }
+            .tm-hotel-info { font-size: 9px !important; font-weight: bold; color: #334155; }
+
+            .tm-meal-wrapper { display: flex; flex-direction: column; gap: 5px; text-align: left; padding-left: 2px; }
+            .tm-meal-simple { display: flex; align-items: flex-start; font-size: 9.5px !important; line-height: 1.4; }
+            .tm-meal-simple strong { color: var(--tm); margin-right: 4px; width: 14px; flex-shrink: 0; }
+
+            .print-contacts { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px; padding: 8px 10px; background: #f8fafc !important; border: 1px solid #cbd5e1 !important; border-radius: 4px; font-size: 10px; margin-top: 10px; margin-bottom: 8px; }
+            .print-contacts .pc-role { font-weight: 700; color: var(--tm); margin-right: 4px; }
+
+            .print-credit { margin-top: 10px; padding-top: 8px; border-top: 1px solid #cbd5e1; text-align: center; }
+            .print-credit-text { font-size: 9px; color: #475569; font-weight: 500; }
+            .print-checklist { border: 1.5px solid #1e293b; border-radius: 6px; padding: 9px 12px; background: #fff !important; margin-bottom: 8px; }
+            .print-checklist h2 { font-size: 12px; font-weight: 800; color: var(--tm); margin: 0 0 6px 0; }
+            .print-checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 9.8px; font-weight: 600; }
+            .print-check-item { display: flex; align-items: flex-start; gap: 6px; line-height: 1.3; }
+            .print-check-box { width: 11px; height: 11px; border: 1.5px solid var(--tm); border-radius: 2px; flex-shrink: 0; margin-top: 1.5px; }
+            .print-note-list { font-size: 9.8px; color: #475569; line-height: 1.42; margin: 0 0 8px 0; padding-left: 16px; }
+            .print-qr-box { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border: 1.5px solid #1e293b; border-radius: 6px; background: #f8fafc !important; margin-bottom: 8px; }
+            .print-qr-box img { width: 92px; height: 92px; border: 1px solid #1e293b; background: #fff; flex-shrink: 0; }
+            .print-qr-box .qr-copy { font-size: 11px; line-height: 1.4; font-weight: 600; }
+            .print-qr-box .qr-copy strong { color: var(--tm); font-size: 12.5px; display: block; margin-bottom: 3px; }
+            .print-qr-box .qr-url { color: #475569; font-size: 9.5px; word-break: break-all; font-weight: 500; }
+        }
+    </style>
+</head>
+<body class="antialiased pb-20 md:pb-0 relative tm-secure-select">
+
+    <!-- [Security Lock Modal] 출발 2주 전 자동 해제형 보안 잠금 (비번: 출발일 MMDD) -->
+    <div id="guidebook-lock-modal" class="fixed inset-0 z-[999] hidden items-center justify-center bg-slate-900/90 backdrop-blur-md px-4 no-print" role="dialog" aria-modal="true" aria-labelledby="guidebook-lock-title">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 md:p-8 shadow-2xl text-center border border-slate-100 animate-fade-in-up">
+            <div class="w-16 h-16 bg-blue-50 text-[#004098] rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-sm">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 id="guidebook-lock-title" class="text-xl font-bold text-slate-800 mb-1">보안 접속 인증</h3>
+            <p class="text-xs text-slate-500 mb-6 leading-relaxed">
+                본 가이드북은 저작권 및 일정 보호를 위해<br>
+                출발 2주 전까지 비밀번호 인증이 필요합니다.<br>
+                <span class="text-xs font-bold text-[#004098] mt-1 block">💡 힌트: 출발 날짜 4자리 (예: 11월 13일 ➔ 1113)</span>
+            </p>
+            <div class="space-y-3">
+                <input type="password" id="lock-password-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="비밀번호 4자리 입력" class="w-full text-center tracking-widest text-lg font-bold border-2 border-slate-200 focus:border-[#004098] rounded-2xl px-4 py-3 outline-none transition" aria-label="비밀번호 4자리">
+                <button type="button" onclick="verifyGuidebookPassword()" class="w-full bg-[#004098] hover:bg-[#002d6b] text-white font-bold py-3.5 rounded-2xl shadow-md transition text-sm">
+                    가이드북 입장하기
+                </button>
+            </div>
+            <p id="lock-error-msg" class="text-xs text-rose-600 font-bold mt-3 hidden">비밀번호가 일치하지 않습니다.</p>
+            <div class="mt-6 pt-4 border-t border-slate-100 text-[10px] text-slate-400">
+                [System Powered by TOURMAKER] 지적재산권 보호 구역
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-white/95 backdrop-blur-md shadow-md sticky top-0 z-50 no-print">
+        <nav class="container mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 shrink-0">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker" class="h-6 md:h-8 w-auto">
+                <span id="d-day-badge" class="bg-tm text-white text-[10px] px-2.5 py-1 rounded-full font-bold shadow-sm animate-pulse">상태 계산중</span>
+            </div>
+            <div class="flex-1 overflow-x-auto no-scrollbar ml-4 md:ml-8">
+                <div class="flex items-center space-x-1 md:space-x-3 whitespace-nowrap pr-4 text-sm">
+                    <a href="#home" class="px-3 py-2 font-bold text-slate-600 hover:text-tm rounded-lg">홈</a>
+                    <a href="#highlights" class="px-3 py-2 font-bold text-tm rounded-lg">핵심포인트</a>
+                    <a href="#flight" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">항공</a>
+                    <a href="#seat-checkin" class="px-3 py-2 font-bold text-sky-700 hover:bg-sky-50 rounded-lg">좌석·체크인</a>
+                    <a href="#map-section" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">동선</a>
+                    <a href="#schedule" class="px-3 py-2 font-bold text-tm rounded-lg">상세일정</a>
+                    <a href="#entry" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">입국신고</a>
+                    <a href="#hotel" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">호텔</a>
+                    <a href="#check" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">준비물</a>
+                    <a href="#smart-info" class="px-3 py-2 font-medium text-slate-600 hover:text-tm rounded-lg">여행비서</a>
+                    <a href="#contact" class="px-3 py-2 font-bold text-red-600 rounded-lg">연락망</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="shareLink()" class="p-2 text-slate-500 hover:text-tm" title="공유"><i class="fa-solid fa-share-nodes text-xl"></i></button>
+            </div>
+        </nav>
+        <div id="event-day-bar" class="hidden no-print bg-tm text-white">
+            <div class="container mx-auto px-4 py-2 flex items-center justify-center gap-2">
+                <button type="button" onclick="goToTodaySchedule()" class="inline-flex items-center gap-2 bg-white text-tm font-extrabold text-sm px-4 py-2 rounded-full shadow-sm">오늘의 일정</button>
+                <button type="button" onclick="goToTodayRoute()" class="inline-flex items-center gap-2 bg-white/15 border border-white/40 text-white font-extrabold text-sm px-4 py-2 rounded-full">당일 동선</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div id="print-area">
+            <div class="print-page">
+            <div class="print-header-top">
+                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker">
+                <div class="print-doc-no">문서번호: TM-270312-DANANG · 1/2</div>
+            </div>
+            <div class="print-title">다낭·호이안 5박 6일 일정표 (안내 초안)</div>
+            <p class="print-subtitle">※ 본 일정표는 항공·현지 기상 및 교통 상황에 따라 유연하게 진행됩니다.</p>
+
+            <div class="print-overview">
+                <div><span class="label">단체</span> —</div>
+                <div><span class="label">일정</span> 2027.03.12(금) ~ 03.17(수)</div>
+                <div><span class="label">가이드</span> 미정 출발 전 안내</div>
+                <div><span class="label">항공</span> 썬푸꾸옥항공 9G0421 / 9G0420</div>
+                <div><span class="label">호텔</span> 어웨이큰 다낭 호텔</div>
+                <div><span class="label">조건</span> 노옵션 · 팁포함 · 안내 초안</div>
+            </div>
+
+            <table class="tm-table">
+                <thead><tr><th class="tm-col-date">일자/지역</th><th class="tm-col-desc">상세 일정 및 관광지</th><th class="tm-col-meal">식사/숙박</th></tr></thead>
+                <tbody>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">1일차<br><span class="text-[9px] text-slate-500 font-normal">03/12(금)</span><br><br>인천<br>다낭</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">오전</span> 인천 출발 → 다낭 도착</div>
+                            <ul class="tm-desc-list">
+                                <li>인천공항 <strong>제1터미널 3층</strong> 체크인 · 면세 (개별 수속)</li>
+                                <li><strong>[07:00]</strong> 썬푸꾸옥항공(9G0421) 인천 출발 · 직항</li>
+                                <li><strong>[10:10]</strong> 다낭공항 도착 · 피켓 가이드 미팅</li>
+                                <li>중식 · 쌀국수(포) + 넴느엉 세트</li>
+                                <li class="tm-highlight">전신마사지 90분 ※ 매너팁 불포함</li>
+                                <li>호텔 체크인 · 휴식</li>
+                                <li>석식 · 분짜 + 반쎄오 세트</li>
+                            </ul>
+                            <hr class="tm-hotel-divider"><div class="tm-hotel-info">🏨 어웨이큰 다낭 호텔 ☎ +84-236-655-8558</div>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 불포함</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 포+넴느엉</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 분짜+반쎄오</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">2일차<br><span class="text-[9px] text-slate-500 font-normal">03/13(토)</span><br><br>다낭<br>호이안</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">전일</span> 마블 · 바스켓 · 호이안 올드타운 · 야경</div>
+                            <ul class="tm-desc-list">
+                                <li>호텔 조식 · 오전 자유</li>
+                                <li>중식 · <strong>솔향</strong> 프리미엄 한식</li>
+                                <li><strong>마블마운틴(오행산)</strong></li>
+                                <li>다낭 <strong>바스켓보트</strong> 체험</li>
+                                <li>호이안 이동 · 투본강 보트(도예마을)</li>
+                                <li>올드타운: 복건회관 · 일본교 · 푸응흥 · 탄끼 고택</li>
+                                <li>석식 · 호이안 전통음식</li>
+                                <li class="tm-highlight">호이안 야경 (음료 1잔 + 소원배) 후 호텔</li>
+                            </ul>
+                            <hr class="tm-hotel-divider"><div class="tm-hotel-info">🏨 상동 (동일 호텔 연박)</div>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 호텔식</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 솔향 한식</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 호이안 전통</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">3일차<br><span class="text-[9px] text-slate-500 font-normal">03/14(일)</span><br><br>바나힐</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">전일</span> 바나힐 · 마사지 · 해산물</div>
+                            <ul class="tm-desc-list">
+                                <li>호텔 조식 · 오전 자유</li>
+                                <li><strong>[11:00]</strong> 바나힐 이동 (약 40분)</li>
+                                <li>중식 · Four Seasons Buffet</li>
+                                <li class="tm-highlight">바나힐 (케이블카·판타지파크·황금손다리 등 반일)</li>
+                                <li>전신마사지 90분 ※ 매너팁 불포함</li>
+                                <li>석식 · 해산물 프라이빗룸 + 노래방기기</li>
+                            </ul>
+                            <hr class="tm-hotel-divider"><div class="tm-hotel-info">🏨 상동 (동일 호텔 연박)</div>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 호텔식</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 포시즌 뷔페</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 해산물</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">4일차<br><span class="text-[9px] text-slate-500 font-normal">03/15(월)</span><br><br>다낭</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">전일</span> 머드온천 · 루프탑 스테이크 · 야시장</div>
+                            <ul class="tm-desc-list">
+                                <li>호텔 조식</li>
+                                <li class="tm-highlight">다낭 핫스프링 머드온천 (머드 + 워터파크)</li>
+                                <li>중식 · 현지식</li>
+                                <li>전신마사지 90분 ※ 매너팁 불포함</li>
+                                <li>석식 · <strong>다낭타워 루프탑</strong> 씨푸드+스테이크 세트</li>
+                                <li>다낭 야시장 체험 후 호텔 자유</li>
+                            </ul>
+                            <hr class="tm-hotel-divider"><div class="tm-hotel-info">🏨 상동 (동일 호텔 연박)</div>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 호텔식</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 현지식</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 루프탑 스테이크</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">5일차<br><span class="text-[9px] text-slate-500 font-normal">03/16(화)</span><br><br>다낭</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">전일</span> 시내관광 · 한강유람선</div>
+                            <ul class="tm-desc-list">
+                                <li>호텔 조식</li>
+                                <li><strong>린응사(영흥사·손짜)</strong></li>
+                                <li><strong>다낭대성당</strong> (핑크 성당)</li>
+                                <li>전신마사지 90분 ※ 매너팁 불포함</li>
+                                <li>석식 · 삼겹살</li>
+                                <li class="tm-highlight">한강 유람선 체험 후 호텔</li>
+                            </ul>
+                            <hr class="tm-hotel-divider"><div class="tm-hotel-info">🏨 상동 (동일 호텔 연박)</div>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 호텔식</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 현지식</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 삼겹살</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="tm-day-divider">
+                        <td class="tm-col-date">6일차<br><span class="text-[9px] text-slate-500 font-normal">03/17(수)</span><br><br>다낭<br>인천</td>
+                        <td class="tm-col-desc">
+                            <div class="tm-time-flow"><span class="tm-time-tag">야간</span> 귀국 항공</div>
+                            <ul class="tm-desc-list">
+                                <li>호텔 조식 · 체크아웃 · 자유시간</li>
+                                <li>다낭공항 이동 · 출국 수속</li>
+                                <li><strong>[23:15]</strong> 썬푸꾸옥항공(9G0420) 다낭 출발 · 직항</li>
+                                <li><strong>[05:30(+1)]</strong> 인천 제1터미널 도착 및 해산</li>
+                            </ul>
+                        </td>
+                        <td class="tm-col-meal">
+                            <div class="tm-meal-wrapper">
+                                <div class="tm-meal-simple"><strong>조</strong> 호텔식</div>
+                                <div class="tm-meal-simple"><strong>중</strong> 자유</div>
+                                <div class="tm-meal-simple"><strong>석</strong> 기내식</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+
+            <div class="print-contacts">
+                <span><span class="pc-role">담당</span> 김효돈 이사 · 이재명 010-9443-7881</span>
+                <span><span class="pc-role">현지가이드</span> 미정 출발 전 안내</span>
+                <span><span class="pc-role">주다낭총영사관</span> +84-23-6356-6100</span>
+                <span><span class="pc-role">영사콜센터</span> +82-2-3210-0404</span>
+            </div>
+
+            <div class="print-credit">
+                <p class="print-credit-text">[System Powered by TOURMAKER] 본 스마트 가이드북은 <strong>고객</strong>의 기획과 <strong>투어메이커</strong>의 트래블 테크 기술 제휴로 제작되었습니다.</p>
+            </div>
+            </div>
+
+            <div class="print-page print-page-2">
+                <div class="print-header-top">
+                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHfgIX70O5k6Anuo0UgALIdaG9jSga9auHu3uyz0uEirylGPAJnjN_qQbvEGMUvPqUQf_g9FMNUHRxlDcUBf4vZ3Mpy4TnA9WxbmzWYK11gt2zuy_Irl4wctNFjcjLyPo0GPXV792o_J7L9guRMuDfeC1gy7USwywjYbECZgzcsHybuGRRAXAnO1eNmP8/s320/logo.png" alt="Tourmaker">
+                    <div class="print-doc-no">문서번호: TM-270312-DANANG · 2/2</div>
+                </div>
+                <div class="print-title">출발 전 준비물 &amp; 스마트 가이드북</div>
+                <p class="print-subtitle">※ 베트남 다낭·호이안 일정에 맞춰 현장에서 바로 체크하고, QR로 스마트 가이드북을 열어 주세요.</p>
+                <div class="print-overview">
+                    <div><span class="label">일정</span> 2027.03.12(금) ~ 03.17(수)</div>
+                    <div><span class="label">가이드</span> 미정 출발 전 안내</div>
+                    <div><span class="label">항공</span> 썬푸꾸옥항공 9G0421 / 9G0420 · ICN T1</div>
+                    <div><span class="label">호텔</span> 어웨이큰 다낭 호텔</div>
+                </div>
+                <div class="print-checklist">
+                    <h2>□ 베트남 다낭·호이안 출발 전 준비물</h2>
+                    <div class="print-checklist-grid">
+                        <div class="print-check-item"><span class="print-check-box"></span>여권 원본 (귀국일 기준 유효기간 6개월 이상)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>여권 사본 2부 (가방·객실 분리 보관)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>사전입국신고(PAI) QR 저장 (투어메이커 전달 또는 개인 작성)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>동(VND) 소액 환전 + 해외겸용 카드</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>마사지 매너팁 (일정 불포함 · 현장 안내)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>편한 걷기 신발 (호이안 올드타운·마블마운틴)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>3월 햇볕 대비 모자·선크림·가벼운 겉옷</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>반팔·얇은 긴팔 + 에어컨·차량용 겉옷</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>자외선 차단제·모자·선글라스 (미케·바나힐)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>모기기피제 (바스켓보트·호이안 야외)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>상비약·복용약·멀미약·지사제·방수밴드</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>세면도구 · 개인 위생용품 · 생리용품</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>멀티 어댑터 (베트남 220V · A/C형)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>보조배터리(지퍼백·절연테이프 / 기내 직접 휴대)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>수영복·슬리퍼 (호텔 수영장·미케해변)</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>해외 로밍/eSIM · 카카오톡 비상연락 확인</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>여행자보험 증권(모바일) · 여정표 캡처</div>
+                        <div class="print-check-item"><span class="print-check-box"></span>인천 T1 · 출발 최소 3시간 전 도착(개별 수속)</div>
+                    </div>
+                </div>
+                <div class="print-checklist">
+                    <h2>✈ 썬푸꾸옥항공 온라인 체크인 · 개별 수속 &amp; 보조배터리 기내반입 안내</h2>
+                    <ul class="print-note-list" style="margin:0;">
+                        <li><strong>인천공항 개별 체크인 &amp; 다낭 도착 카톡 연락 · 가이드 미팅</strong> : 한국 출발 시 인솔자가 동행하지 않으므로 인천국제공항 <strong>제1여객터미널(T1)</strong>에서 개별 체크인 후 출국하시며, <strong>다낭공항 도착 시 카카오톡으로 연락드린 뒤 현지 가이드 미정과 미팅</strong>합니다.</li>
+                        <li><strong>온라인 체크인 &amp; 무료 좌석배정 (출발 24시간 ~ 1시간 전)</strong> : 가는 편(9G0421) 03/11(목) 07:00 오픈, 오는 편(9G0420) 03/16(화) 23:15 오픈(출발 24시간 전) · 썬푸꾸옥항공 홈페이지·앱에서 잔여 일반석 무료 선택 가능하며, 미진행 시 출발 당일 공항 카운터에서 여권 제시로 좌석 배정을 받으실 수 있습니다.</li>
+                        <li><strong>[필수] 보조배터리·전자담배 기내반입 기준</strong> : ① 위탁수하물 금지 및 <strong>기내 사용·충전 금지</strong> ② <strong>기내 선반 보관 불가</strong> (직접 휴대 또는 앞좌석 주머니 보관) ③ <strong>단락 방지 필수</strong> (절연테이프·투명비닐백 보관, 전자담배 전원 OFF) ④ 1인당 <strong>2개까지</strong> 허용, 160Wh 초과 불가 (100~160Wh는 카운터 승인 필수) · 파손/리콜 배터리 반입 금지</li>
+                    </ul>
+                </div>
+                <ul class="print-note-list">
+                    <li>한국인은 45일 무비자(면제)이며 PAI는 별도 필수입니다. 원칙은 개인 작성이며, 이번 일정은 <strong>투어메이커가 작성한 뒤 QR로 전달</strong>합니다. 직접 작성 시 도착 72시간 전(한국 시간 03/09 이후(도착 72시간 전)) <strong>prearrival.immigration.gov.vn</strong> · 비자 종류 <strong>단방향면제</strong> · 비자번호 <strong>빈칸</strong>.</li>
+                    <li>베트남은 한국보다 <strong>2시간 느립니다</strong> (현지 UTC+7). 약 복용·기상 시간에 참고하세요.</li>
+                    <li>3월 다낭·호이안은 비교적 건조하고 따뜻합니다. <strong>자외선 차단·모자·가벼운 겉옷</strong>을 준비하세요.</li>
+                    <li>전압은 한국과 같은 220V입니다. 콘센트는 A/C형이라 한국 C형은 대체로 맞지만, A형 대비 <strong>멀티 어댑터</strong>를 챙기세요.</li>
+                    <li>전신마사지 매너팁은 일정에 포함되지 않습니다. 금액은 현장에서 안내합니다.</li>
+                    <li>호이안·마블마운틴은 도보가 많습니다. <strong>미끄럼 방지 걷기 신발</strong>을 권장합니다.</li>
+                </ul>
+                <div class="print-qr-box">
+                    <img src="assets/images/guidebook-qr.png" alt="스마트 가이드북 QR">
+                    <div class="qr-copy">
+                        <strong>스마트 가이드북 바로가기</strong>
+                        QR코드를 스캔하시면 실시간 날씨, 세부 일정, 여행동선, 준비물 체크리스트를 스마트폰에서 확인하실 수 있습니다.
+                        <div class="qr-url">https://indadady.github.io/270312_Danang/</div>
+                    </div>
+                </div>
+                <div class="print-contacts">
+                    <span><span class="pc-role">담당</span> 김효돈 이사 · 이재명 010-9443-7881</span>
+                    <span><span class="pc-role">현지가이드</span> 미정 출발 전 안내</span>
+                    <span><span class="pc-role">주다낭총영사관</span> +84-23-6356-6100</span>
+                    <span><span class="pc-role">영사콜센터</span> +82-2-3210-0404</span>
+                </div>
+                <div class="print-credit">
+                    <p class="print-credit-text">[System Powered by TOURMAKER] 본 스마트 가이드북은 <strong>고객</strong>의 기획과 <strong>투어메이커</strong>의 트래블 테크 기술 제휴로 제작되었습니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <section id="home" class="hero-bg min-h-[88vh] flex items-center justify-center text-center px-4 py-16 relative">
+            <div class="animate-fade-in-up text-white z-10 w-full max-w-5xl flex flex-col items-center">
+                <p class="text-xs md:text-sm font-bold tracking-[0.28em] text-blue-100 mb-3">다낭 · 호이안 · 5박 6일</p>
+                <h1 class="text-6xl md:text-8xl font-black tracking-tight drop-shadow-2xl font-[Nanum Myeongjo] leading-none">다낭·호이안</h1>
+                <p class="text-3xl md:text-5xl font-bold mt-4 mb-5 drop-shadow-2xl font-[Nanum Myeongjo] leading-tight">
+                    미케의 바다에서<br><span class="text-blue-300">호이안의 등불</span>까지
+                </p>
+                <p id="hero-date" class="text-sm md:text-lg text-slate-100 font-medium bg-black/40 px-5 py-2.5 rounded-2xl backdrop-blur-sm border border-white/10 shadow-xl tracking-wide">
+                    2027.03.12(금) ~ 03.17(수)<br>썬푸꾸옥항공 9G0421/9G0420 · 직항
+                </p>
+                <a href="#contact" class="mt-5 inline-flex flex-col items-center gap-1 bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/35 rounded-2xl px-7 py-4 shadow-xl transition-colors">
+                    <span class="text-[11px] font-bold tracking-[0.22em] text-blue-100">현지 가이드</span>
+                    <span class="text-2xl md:text-3xl font-black leading-tight">미정</span>
+                    <span class="text-base md:text-lg font-bold text-blue-100">출발 전 안내</span>
+                </a>
+                <div class="mt-8 animate-bounce">
+                    <a href="#highlights" class="text-white/70 hover:text-white transition-colors"><i class="fa-solid fa-chevron-down text-3xl"></i></a>
+                </div>
+            </div>
+        </section>
+
+        <section id="highlights" class="py-16 bg-white -mt-10 rounded-t-3xl relative z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.08)]">
+            <div class="container mx-auto px-4 max-w-6xl">
+                <div class="text-center mb-12">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase bg-blue-50 px-4 py-1.5 rounded-full">PREMIUM HIGHLIGHTS</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-slate-800 mt-4">이번 여정의 핵심 포인트</h2>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6 mb-14">
+                    <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100 shadow-sm hover:-translate-y-1 transition-transform ring-2 ring-tm/10">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-tm text-2xl mb-4 shadow-sm"><i class="fa-solid fa-plane"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">썬푸꾸옥항공 직항 · VIP 일정</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">썬푸꾸옥항공 9G0421/9G0420 왕복 직항. 어웨이큰 다낭 호텔(또는 동급), 전용차량, 식사·입장료·기사/가이드·팁이 포함된 노옵션 일정입니다.</p>
+                    </div>
+                    <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100 shadow-sm hover:-translate-y-1 transition-transform">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-amber-500 text-2xl mb-4 shadow-sm"><i class="fa-solid fa-bridge"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">바나힐 · 황금손다리</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">바나힐 반일 코스와 머드온천·루프탑 스테이크·한강 유람선까지, 다낭의 휴식과 야경을 여유 있게 담습니다.</p>
+                    </div>
+                    <div class="bg-blue-50/50 p-8 rounded-3xl border border-blue-100 shadow-sm hover:-translate-y-1 transition-transform">
+                        <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-rose-500 text-2xl mb-4 shadow-sm"><i class="fa-solid fa-lightbulb"></i></div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-3">호이안 UNESCO · 야경</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">마블마운틴·바스켓보트·투본강 보트와 올드타운(복건회관·일본교·고택), 소원배 야경까지 하루 안에 담습니다.</p>
+                    </div>
+                </div>
+
+                <div class="text-center mb-8">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase">DESTINATION</span>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mt-2">한눈에 보는 여행지</h3>
+                    <p class="text-sm text-slate-500 mt-2">중부 베트남의 해변 도시와 유네스코 고도, 두 얼굴을 잇는 여정입니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                        <h4 class="font-bold text-tm mb-3 flex items-center gap-2"><i class="fa-solid fa-umbrella-beach"></i> 다낭 — 해변과 현대 스카이라인</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">미케해변·한강·드래곤브릿지로 상징되는 중부 거점 도시입니다. 박물관·성당의 역사와 바나힐·린응사 관음상, 야간 크루즈가 하루의 리듬을 만듭니다.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                        <h4 class="font-bold text-amber-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-landmark"></i> 호이안 — 등불의 올드타운</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">유네스코 세계문화유산 고대 항구 도시. 일본교와 전통 가옥, 투본강 보트·씨클로 야경이 3월의 따뜻한 기후와 잘 어울립니다.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                        <h4 class="font-bold text-emerald-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-mountain-sun"></i> 바나힐 · 마블마운틴</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed">고지 케이블카와 황금손다리, 대리석 산군의 동굴·전망이 다낭 근교의 대표 하이라이트입니다.</p>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6">
+                        <h4 class="font-bold text-rose-700 mb-3 flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> 포함 · 불포함 안내</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed"><strong>포함:</strong> 어웨이큰 다낭 호텔, 전용차량, 식사, 입장료, 기사/가이드, 팁.<br><strong>불포함:</strong> 마사지 매너팁, 개인경비. 현지 사정에 따라 동선이 조정될 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="flight" class="py-16 bg-slate-50 border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <div class="text-center mb-10">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase"><i class="fa-solid fa-ticket"></i> FLIGHT INFO</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-2">항공 스케줄</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white p-8 rounded-3xl border shadow-sm">
+                        <div class="flex items-center gap-4 mb-5">
+                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-tm text-xl shrink-0"><i class="fa-solid fa-plane-departure"></i></div>
+                            <div><p class="text-xs text-slate-400 font-bold mb-0.5">출국 · 03/12 (금)</p><h3 class="font-bold text-xl text-slate-800">인천 <i class="fa-solid fa-arrow-right mx-1 text-sm text-slate-300"></i> 다낭</h3></div>
+                        </div>
+                        <ul class="text-sm text-slate-600 space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">항공편</span> <span class="font-bold text-tm">썬푸꾸옥항공 9G0421</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">인천 출발</span> <span>07:00 (ICN T1)</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">다낭 도착</span> <span>10:10 (DAD)</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">기종</span> <span>직항</span></li>
+                            <li class="flex justify-between pt-2 border-t border-slate-200"><span class="font-bold text-slate-700">비행시간</span> <span>약 4시간 10분</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border shadow-sm">
+                        <div class="flex items-center gap-4 mb-5">
+                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-tm text-xl shrink-0"><i class="fa-solid fa-plane-arrival"></i></div>
+                            <div><p class="text-xs text-slate-400 font-bold mb-0.5">귀국 · 03/17 (수) 야간</p><h3 class="font-bold text-xl text-slate-800">다낭 <i class="fa-solid fa-arrow-right mx-1 text-sm text-slate-300"></i> 인천</h3></div>
+                        </div>
+                        <ul class="text-sm text-slate-600 space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">항공편</span> <span class="font-bold text-tm">썬푸꾸옥항공 9G0420</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">다낭 출발</span> <span>23:15 (DAD)</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">인천 도착</span> <span>05:30(+1) (ICN T1)</span></li>
+                            <li class="flex justify-between"><span class="font-bold text-slate-700">기종</span> <span>직항</span></li>
+                            <li class="flex justify-between pt-2 border-t border-slate-200"><span class="font-bold text-slate-700">비행시간</span> <span>약 4시간 15분</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white rounded-3xl border shadow-sm overflow-hidden">
+                    <div class="md:flex">
+                        <img src="assets/images/airline-b787.jpg" alt="썬푸꾸옥항공 썬푸꾸옥항공 직항" class="w-full md:w-[42%] h-56 md:h-auto object-cover">
+                        <div class="p-6 md:p-8 flex-1">
+                            <p class="text-xs font-black tracking-widest text-tm uppercase mb-2">AIRLINE</p>
+                            <h3 class="text-2xl font-bold text-slate-800">썬푸꾸옥항공 Korean Air</h3>
+                            <p class="text-sm text-slate-500 mt-1">KE · 스카이팀 창립 멤버 · 인천국제공항 제2여객터미널</p>
+                            <p class="text-sm text-slate-600 leading-relaxed mt-4">베트남 썬그룹 계열의 신규 항공사입니다. 이번 일정은 인천↔다낭 직항 <strong>9G0421 / 9G0420</strong>을 이용합니다. 항공권 발권(E-티켓 발행) 완료 후 썬푸꾸옥항공 홈페이지·앱에서 온라인 체크인(출발 24시간 전~1시간 전)을 진행해 주세요.</p>
+                            <div class="grid grid-cols-2 gap-3 mt-5 text-sm">
+                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                    <p class="text-[11px] font-bold text-slate-400">이번 여정 기종</p>
+                                    <p class="font-bold text-slate-800 mt-0.5">Boeing 787-9</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                    <p class="text-[11px] font-bold text-slate-400">운항 터미널</p>
+                                    <p class="font-bold text-slate-800 mt-0.5">인천 T1 · 다낭 T2</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                    <p class="text-[11px] font-bold text-slate-400">위탁 수하물</p>
+                                    <p class="font-bold text-slate-800 mt-0.5">1인 1PC</p>
+                                </div>
+                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                                    <p class="text-[11px] font-bold text-slate-400">공항 도착</p>
+                                    <p class="font-bold text-slate-800 mt-0.5">출발 최소 2시간 전</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-4">※ 기종·스케줄은 항공사 사정으로 변경될 수 있습니다. 탑승수속 시 재확인해 주세요.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="seat-checkin" class="py-16 bg-sky-50/70 border-t border-sky-100">
+            <div class="container mx-auto px-4 max-w-4xl">
+                <div class="text-center mb-8">
+                    <span class="inline-block bg-tm text-white text-xs px-3 py-1 rounded-full font-bold shadow-sm mb-3">SUN PHUQUOC · CHECK-IN</span>
+                    <h2 class="text-2xl md:text-3xl font-bold text-slate-800">썬푸꾸옥항공 온라인 체크인 · 개별 수속 안내</h2>
+                    <p class="text-slate-600 mt-2 text-sm">항공권 발권(E-티켓 발행) 완료 후 · 인천공항은 <strong>개별 체크인</strong> · 다낭 도착 후 <strong>카톡 확인 → 현지 가이드 미팅</strong>입니다.</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-md border border-sky-100 p-6 md:p-8 mb-5">
+                    <div class="grid sm:grid-cols-3 gap-3 mb-5">
+                        <div class="rounded-2xl bg-emerald-50 border border-emerald-100 p-4 text-center">
+                            <p class="font-bold text-slate-800 text-sm">온라인 체크인 · 좌석</p>
+                            <span class="inline-block text-[11px] font-bold text-emerald-700 bg-white px-2.5 py-0.5 rounded-full border border-emerald-200 mt-1">출발 24시간 ~ 1시간 전</span>
+                        </div>
+                        <div class="rounded-2xl bg-sky-50 border border-sky-100 p-4 text-center">
+                            <p class="font-bold text-slate-800 text-sm">인천 T1 카운터 수속</p>
+                            <span class="inline-block text-[11px] font-bold text-sky-700 bg-white px-2.5 py-0.5 rounded-full border border-sky-200 mt-1">출발 3시간 전 권장</span>
+                        </div>
+                        <div class="rounded-2xl bg-amber-50 border border-amber-100 p-4 text-center">
+                            <p class="font-bold text-slate-800 text-sm">다낭 카톡 · 가이드 미팅</p>
+                            <span class="inline-block text-[11px] font-bold text-amber-700 bg-white px-2.5 py-0.5 rounded-full border border-amber-200 mt-1">도착 후 카톡 확인</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-xs text-slate-600 space-y-1.5 mb-4">
+                        <p><strong class="text-tm">가는 편 9G0421</strong> · 03/11 07:00 오픈 ~ 03/12 06:00 마감 (인천 T1)</p>
+                        <p><strong class="text-tm">오는 편 9G0420</strong> · 03/16 23:15 오픈 ~ 03/17 22:15 마감 (다낭)</p>
+                        <p class="text-slate-500">온라인 체크인 시 잔여 좌석을 선택할 수 있습니다(운임에 따라 유·무료). 미진행 시 공항 카운터에서 일행 여권을 함께 제시하면 인접 좌석 배정을 요청할 수 있습니다.</p>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 text-xs text-blue-900 mb-5 leading-relaxed">
+                        도착 후 카톡을 꼭 확인해 주세요. <strong>현지 가이드(미정 · 출발 전 안내)</strong>와 미팅한 뒤 일정을 시작합니다.
+                    </div>
+                    <a href="https://www.sunphuquocairways.com/kr/ko/travel-info/check-in/online" target="_blank" rel="noopener" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-tm hover:bg-tm-dark text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition text-sm">
+                        <i class="fa-solid fa-plane-circle-check"></i> 썬푸꾸옥항공 온라인 체크인 안내
+                    </a>
+                </div>
+
+                <div id="powerbank" class="bg-white rounded-3xl shadow-md border border-rose-100 p-6 md:p-8 mb-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-5">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="bg-rose-500 text-white w-9 h-9 rounded-xl flex items-center justify-center text-sm shadow-sm shrink-0">
+                                <i class="fa-solid fa-battery-exclamation"></i>
+                            </span>
+                            <div class="min-w-0 text-left">
+                                <h3 class="font-extrabold text-slate-800 text-base md:text-lg leading-snug">보조배터리 · 전자담배 기내반입</h3>
+                                <p class="text-xs text-slate-500 mt-0.5">항공사 공통 안전 규정 · 출국 전 확인</p>
+                            </div>
+                        </div>
+                        <span class="bg-rose-50 text-rose-700 border border-rose-200 text-[11px] font-extrabold px-3 py-1 rounded-full shrink-0">위탁 수하물 절대 금지</span>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        <div class="rounded-2xl bg-rose-50/70 border border-rose-100 p-4 flex items-start gap-3">
+                            <i class="fa-solid fa-ban text-rose-600 mt-0.5 shrink-0"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">기내 사용·충전 금지</p>
+                                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">위탁 가방 금지 · 기내에서도 사용·충전 불가</p>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-rose-50/70 border border-rose-100 p-4 flex items-start gap-3">
+                            <i class="fa-solid fa-suitcase-rolling text-rose-600 mt-0.5 shrink-0"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">머리 위 선반 보관 불가</p>
+                                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">직접 휴대 또는 앞좌석 주머니에 보관</p>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-rose-50/70 border border-rose-100 p-4 flex items-start gap-3">
+                            <i class="fa-solid fa-shield-halved text-rose-600 mt-0.5 shrink-0"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">단락 방지 필수</p>
+                                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">절연테이프·투명 비닐백 · 전자담배 전원 OFF</p>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl bg-rose-50/70 border border-rose-100 p-4 flex items-start gap-3">
+                            <i class="fa-solid fa-bolt text-rose-600 mt-0.5 shrink-0"></i>
+                            <div>
+                                <p class="font-bold text-slate-800 text-sm">용량 · 개수 제한</p>
+                                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">1인 최대 2개 · 160Wh 초과 불가 (100~160Wh 카운터 승인)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-center text-xs text-slate-500">※ 항공사 정책·당일 공항 사정에 따라 변동될 수 있습니다.</p>
+            </div>
+        </section>
+
+
+        <section id="entry" class="py-16 bg-white border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <div class="text-center mb-10">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase">VIETNAM ENTRY · PAI</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-2">온라인 사전입국신고 (PAI)</h2>
+                    <p class="text-sm text-slate-500 mt-2">다낭 입국 시 외국인 전원 필수입니다. 원칙은 개인이 직접 작성하는 것이며, 이번 일정은 편의를 위해 투어메이커가 작성해 배포합니다.</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-3xl p-6 md:p-8 mb-6">
+                    <h3 class="font-bold text-slate-800 mb-3"><i class="fa-solid fa-file-circle-check text-tm mr-2"></i>이번 일정 · 투어메이커 대행 작성</h3>
+                    <ul class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                        <li>• 원칙상 PAI는 참가자 본인이 공식 사이트에서 작성합니다.</li>
+                        <li>• 이번 일정은 편의를 위해 <strong>투어메이커가 작성한 뒤 개인별 QR을 전달</strong>합니다.</li>
+                        <li>• 받으신 QR은 사진이나 PDF로 저장해 두세요. 다낭 공항 와이파이에 의존하지 마세요.</li>
+                        <li>• 다낭 입국심사 때 <strong>여권과 QR</strong>을 함께 제시해 주세요.</li>
+                        <li>• 직접 작성하시려면 아래 매뉴얼을 참고하시면 됩니다.</li>
+                    </ul>
+                </div>
+                <div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 md:p-8 mb-6">
+                    <h3 class="font-bold text-slate-800 mb-3"><i class="fa-solid fa-circle-exclamation text-amber-600 mr-2"></i>직접 작성할 때 꼭 확인하세요</h3>
+                    <ul class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                        <li>• <strong>작성 가능 시점:</strong> 다낭 도착 시각(03/12 14:15, 베트남 시간) 기준 72시간 전입니다. 한국 시간으로는 <strong>11월 10일(화) 16:15 이후</strong>입니다. 그 전에 열면 날짜 제한으로 거절될 수 있습니다.</li>
+                        <li>• <strong>1인 1장:</strong> 참가자 모두 각자 QR코드가 필요합니다.</li>
+                        <li>• 한국인은 45일 무비자(면제)로 입국하며, PAI는 그와 별도로 제출하는 사전 입국 정보입니다. 수수료는 없습니다. 비자 종류는 <strong>단방향면제</strong>를 고르고, 비자번호는 비워 두세요.</li>
+                        <li>• 가짜 사이트 주의: 주소가 <strong>prearrival.immigration.gov.vn</strong> 인지 반드시 확인하세요.</li>
+                        <li>• 제출 후 QR코드를 캡처·PDF 저장해 두세요. 다낭 공항 와이파이에 의존하지 마세요.</li>
+                    </ul>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-3xl p-6 md:p-8 mb-6">
+                    <h3 class="font-bold text-slate-800 mb-2"><i class="fa-solid fa-passport text-emerald-600 mr-2"></i>비자 종류 — 처음이면 여기만 보세요</h3>
+                    <p class="text-sm text-slate-700 leading-relaxed mb-4">화면에는 <strong>전자비자 · 비자 · 양자면제 · 단방향면제</strong>처럼 낯선 말이 나옵니다. 이번 단체(한국 일반여권 · 5박6일 · E-비자 없음)는 아래만 고르면 됩니다.</p>
+                    <div class="bg-white border border-emerald-300 rounded-2xl p-4 mb-4">
+                        <p class="text-base font-black text-emerald-800">선택: <strong>단방향면제</strong> <span class="font-bold text-slate-600">(영문 Unilateral exemption)</span></p>
+                        <p class="text-sm text-slate-600 mt-1">비자번호 · 발행일 · 만료일 칸이 보이면 <strong>비워 두세요.</strong> 무비자는 비자 서류가 없어 번호가 없습니다. 여권번호·항공편 번호를 넣지 마세요.</p>
+                    </div>
+                    <ul class="text-sm text-slate-700 space-y-2 leading-relaxed">
+                        <li>• <strong>단방향면제</strong> = 한국인 45일 무비자 → <span class="text-emerald-700 font-bold">이것 선택</span></li>
+                        <li>• <strong>양자면제</strong> = 외교·관용여권용 → 일반여권 관광객은 선택하지 않음</li>
+                        <li>• <strong>전자비자</strong> = E-비자를 미리 발급받은 경우만</li>
+                        <li>• <strong>비자</strong> = 스티커·일반 비자를 받은 경우만</li>
+                    </ul>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6">
+                        <h3 class="font-bold text-tm mb-3">신고서에 넣을 정보</h3>
+                        <ul class="text-sm text-slate-700 space-y-2">
+                            <li>비자 종류: <strong>단방향면제</strong> (Unilateral exemption)</li>
+                            <li>비자번호: <strong>입력하지 않음</strong> (빈칸)</li>
+                            <li>여행 목적: <strong>Tourism</strong> / 국적: Korea (Republic of)</li>
+                            <li>입국편: <strong>9G0421</strong> · 입국일 <strong>2026-11-13</strong> · Da Nang International Airport</li>
+                            <li>출국편: <strong>9G0420</strong> · 출국일 <strong>2026-11-16</strong></li>
+                            <li>숙소: AWAKEN DANANG HOTEL<br>148 Vo Nguyen Giap Street, An Hai Ward, Da Nang City, Vietnam</li>
+                        </ul>
+                        <button type="button" onclick="copyPaiMemo()" class="mt-4 inline-flex items-center gap-2 bg-tm text-white text-sm font-bold px-4 py-2 rounded-xl">메모 복사</button>
+                    </div>
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6">
+                        <h3 class="font-bold text-slate-800 mb-3">작성 순서</h3>
+                        <ol class="text-sm text-slate-700 space-y-3 list-decimal pl-5">
+                            <li>공식 사이트 접속 후 언어를 한국어로 바꿉니다.</li>
+                            <li>여권 사진면과 글자 하나까지 동일하게 입력합니다. (숫자 0 / 알파벳 O 구별)</li>
+                            <li>비자 종류는 <strong>단방향면제</strong>를 고르고, 비자번호는 비웁니다. 항공·숙소는 왼쪽 메모대로 입력합니다. 국경 검문소는 Da Nang International Airport 입니다.</li>
+                            <li>QR을 사진첩·PDF로 저장하고, 다낭 입국심사 때 여권과 함께 제시합니다.</li>
+                        </ol>
+                        <a href="https://prearrival.immigration.gov.vn/" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-2 text-tm font-bold text-sm">https://prearrival.immigration.gov.vn/</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="map-section" class="py-16 bg-white border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-6xl">
+                <div class="text-center mb-8">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase">ANIMATED ROUTING MAP</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-2">한눈에 보는 동선 지도</h2>
+                    <p class="text-sm text-slate-500 mt-2">실제 도로를 따라 이동 순서가 천천히 그려집니다. 일자 버튼을 누르면 해당 구간만 볼 수 있습니다.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 justify-center mb-6">
+                    <button type="button" onclick="changeMapAndTab('all')" id="btn-map-all" class="map-tab-btn active px-5 py-2 rounded-full text-sm font-bold border bg-tm text-white border-tm shadow-sm transition-colors">전체 여정</button>
+                    <button type="button" onclick="changeMapAndTab('day1')" id="btn-map-day1" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">1일차 도착 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#0ea5e9] ml-1"></span></button>
+                    <button type="button" onclick="changeMapAndTab('day2')" id="btn-map-day2" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">2일차 호이안 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#10b981] ml-1"></span></button>
+                    <button type="button" onclick="changeMapAndTab('day3')" id="btn-map-day3" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">3일차 바나힐 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#f59e0b] ml-1"></span></button>
+                    <button type="button" onclick="changeMapAndTab('day4')" id="btn-map-day4" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">4일차 온천·야시장 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#ec4899] ml-1"></span></button>
+                    <button type="button" onclick="changeMapAndTab('day5')" id="btn-map-day5" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">5일차 시내 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#8b5cf6] ml-1"></span></button>
+                    <button type="button" onclick="changeMapAndTab('day6')" id="btn-map-day6" class="map-tab-btn px-5 py-2 rounded-full text-sm font-bold border bg-white text-slate-600 border-slate-300 hover:bg-slate-50 transition-colors">6일차 귀국 <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#64748b] ml-1"></span></button>
+                </div>
+                <div id="map-wrap" class="max-w-5xl mx-auto border border-slate-200 rounded-2xl p-1 shadow-lg bg-white relative z-0">
+                    <div id="map"></div>
+                    <div id="map-distance" class="hidden">
+                        <p class="text-[10px] font-bold text-slate-400 tracking-wide">대략 이동</p>
+                        <p id="map-distance-leg" class="font-bold text-xs text-slate-800 leading-snug mt-0.5"></p>
+                        <p id="map-distance-time" class="font-black text-sm text-tm mt-0.5 leading-snug"></p>
+                        <p id="map-distance-km" class="text-[10px] font-bold text-slate-500 mt-0.5"></p>
+                    </div>
+                    <div class="map-zoom-btns">
+                        <button type="button" onclick="mapZoom(1)" aria-label="줌인">+</button>
+                        <button type="button" onclick="mapZoom(-1)" aria-label="줌아웃">−</button>
+                    </div>
+                </div>
+                <p id="map-hint" class="text-center text-xs text-tm font-bold mt-4">전체 여정 — 인천 ↔ 다낭 직항(점선) + 다낭·바나힐·호이안 전용차량 실제 도로 동선</p>
+                <p class="text-center text-xs text-slate-400 mt-1">※ 상기 지도는 주요 랜드마크 기준이며 실제 세부 이동과 다를 수 있습니다.</p>
+            </div>
+        </section>
+
+        <section id="schedule" class="py-16 bg-slate-50 border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-6xl">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-10">
+                    <div class="text-center sm:text-left">
+                        <h2 class="text-3xl font-bold text-slate-800">일자별 상세 일정표</h2>
+                        <p class="text-slate-500 text-sm mt-1">탭을 눌러 일자별 상세 내용을 확인하세요. (※ 항공 및 현지 사정에 의해 변동될 수 있습니다)</p>
+                    </div>
+                    <div class="text-center sm:text-right shrink-0 no-print">
+                        <button type="button" onclick="handlePrint()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-tm hover:bg-tm-dark text-white text-sm font-bold rounded-xl shadow-sm transition-colors" title="일정표 인쇄하기">
+                            <i class="fa-solid fa-print"></i> 일정표 인쇄하기
+                        </button>
+                        <p class="mt-2 text-xs text-slate-500 leading-relaxed max-w-[16rem] mx-auto sm:ml-auto sm:mr-0">모바일(카카오톡 등)에서는<br>인쇄가 어려울 수 있어요.<br>다른 브라우저나 PC에서 열어 주세요.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    
+                    <div class="flex flex-wrap border-b bg-slate-50 overflow-x-auto no-scrollbar">
+                        <button onclick="changeMapAndTab('day1')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-tm border-b-2 border-tm transition-colors">1일차 (03/12)</button>
+                        <button onclick="changeMapAndTab('day2')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-slate-500 hover:text-tm transition-colors">2일차 (03/13)</button>
+                        <button onclick="changeMapAndTab('day3')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-slate-500 hover:text-tm transition-colors">3일차 (03/14)</button>
+                        <button onclick="changeMapAndTab('day4')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-slate-500 hover:text-tm transition-colors">4일차 (03/15)</button>
+                        <button onclick="changeMapAndTab('day5')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-slate-500 hover:text-tm transition-colors">5일차 (03/16)</button>
+                        <button onclick="changeMapAndTab('day6')" class="sched-tab flex-1 min-w-[100px] py-4 font-bold text-sm text-slate-500 hover:text-tm transition-colors">6일차 (03/17)</button>
+                    </div>
+
+                    <div id="day1" class="schedule-content p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#0ea5e9] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">1일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">인천 → 다낭 — 도착 · 마사지 · 현지 Culinary</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 불포함</span>
+                                    <span class="bg-orange-50 text-orange-700 border border-orange-100 px-2 py-1 rounded">중: 포+넴느엉</span>
+                                    <span class="bg-blue-50 text-blue-700 border border-blue-100 px-2 py-1 rounded">석: 분짜+반쎄오</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">인천공항 제1터미널 3층 체크인 · 면세</h4>
+                                <p class="text-sm text-slate-500 mt-1">썬푸꾸옥항공 카운터 · 출발 최소 3시간 전 도착 권장 · 개별 수속</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-tm ring-blue-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">07:00 인천 출발 (9G0421) → 10:10 다낭 도착</h4>
+                                <p class="text-sm text-slate-500 mt-1">약 4시간 10분 직항 · 피켓 가이드 미팅 후 일정 시작</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-orange-400 ring-orange-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">중식 — 쌀국수(포) + 넴느엉 세트</h4>
+                            </div>
+                            <div class="relative bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                <div class="timeline-dot bg-rose-500 ring-rose-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-rose-500 text-white px-2 py-1 rounded inline-block mb-2">힐링</span>
+                                <h4 class="font-bold text-lg text-slate-800">전신마사지 90분</h4>
+                                <p class="text-sm text-slate-600 mt-1">장거리 비행 후 피로를 풀어 줍니다. ※ 매너팁 불포함</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-800 ring-slate-200"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 체크인 · 휴식</h4>
+                                <p class="text-sm text-slate-500 mt-1">어웨이큰 다낭 호텔 또는 동급 5성급</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-amber-500 ring-amber-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">석식 — 분짜 + 반쎄오 세트</h4>
+                                <p class="text-sm text-slate-500 mt-1">호텔 투숙 및 휴식</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="day2" class="schedule-content hidden p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#f59e0b] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">2일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">다낭 → 호이안 → 다낭 — 마블 · 바스켓 · 올드타운</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 호텔식</span>
+                                    <span class="bg-rose-50 text-rose-700 border border-rose-100 px-2 py-1 rounded">중: 솔향 한식</span>
+                                    <span class="bg-amber-50 text-amber-800 border border-amber-100 px-2 py-1 rounded">석: 호이안 전통</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 조식 · 오전 자유시간</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-rose-500 ring-rose-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">중식 — 솔향 프리미엄 한식</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-[#f59e0b] ring-amber-100"></div>
+                                <div class="schedule-media">
+                                    <div class="schedule-desc">
+                                        <h4 class="font-bold text-lg text-slate-800">마블마운틴 (오행산)</h4>
+                                        <p class="text-sm text-slate-600 mt-2">대리석 산군의 동굴과 전망을 둘러봅니다.</p>
+                                    </div>
+                                    <img src="assets/images/day3-marble.jpg" alt="마블마운틴" class="schedule-thumb">
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-sky-500 ring-sky-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">다낭 바스켓보트 체험</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-amber-600 ring-amber-100"></div>
+                                <div class="schedule-media">
+                                    <div class="schedule-desc">
+                                        <h4 class="font-bold text-lg text-slate-800">호이안 올드타운 · 투본강 보트</h4>
+                                        <ul class="text-sm text-slate-600 mt-2 space-y-1 list-disc pl-4">
+                                            <li>투본강 보트 (도예마을 포함)</li>
+                                            <li>복건회관 · 일본교 · 푸응흥 고택 · 탄끼 고택</li>
+                                        </ul>
+                                    </div>
+                                    <img src="assets/images/day3-hoian.jpg" alt="호이안 올드타운" class="schedule-thumb">
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-orange-400 ring-orange-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">석식 — 호이안 전통음식</h4>
+                            </div>
+                            <div class="relative bg-amber-50 p-5 rounded-2xl border border-amber-100">
+                                <div class="timeline-dot bg-amber-500 ring-amber-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-amber-500 text-white px-2 py-1 rounded inline-block mb-2">야경</span>
+                                <h4 class="font-bold text-lg text-slate-800">호이안 야경 (음료 1잔 + 소원배)</h4>
+                                <p class="text-sm text-slate-600 mt-1">등불이 켜진 올드타운을 즐긴 뒤 다낭 호텔로 이동합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="day3" class="schedule-content hidden p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#10b981] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">3일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">바나힐 — 케이블카 · 판타지파크 · 마사지</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 호텔식</span>
+                                    <span class="bg-orange-50 text-orange-700 border border-orange-100 px-2 py-1 rounded">중: 포시즌 뷔페</span>
+                                    <span class="bg-sky-50 text-sky-700 border border-sky-100 px-2 py-1 rounded">석: 해산물+노래방</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 조식 · 오전 자유시간</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-[#10b981] ring-emerald-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">11:00 바나힐 이동</h4>
+                                <p class="text-sm text-slate-500 mt-1">약 40분 · 왕복 케이블카</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-orange-400 ring-orange-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">중식 — Four Seasons Buffet</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-emerald-600 ring-emerald-100"></div>
+                                <div class="schedule-media">
+                                    <div class="schedule-desc">
+                                        <h4 class="font-bold text-lg text-slate-800">바나힐 관광 (반일)</h4>
+                                        <p class="text-sm text-slate-600 mt-2">산악 전망 · 케이블카 · 어트랙션 · 판타지파크 · 황금손다리</p>
+                                    </div>
+                                    <img src="assets/images/day2-goldenbridge.jpg" alt="바나힐 황금손다리" class="schedule-thumb">
+                                </div>
+                            </div>
+                            <div class="relative bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                <div class="timeline-dot bg-rose-500 ring-rose-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-rose-500 text-white px-2 py-1 rounded inline-block mb-2">힐링</span>
+                                <h4 class="font-bold text-lg text-slate-800">전신마사지 90분</h4>
+                                <p class="text-sm text-slate-600 mt-1">※ 매너팁 불포함</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-sky-600 ring-sky-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">석식 — 해산물 (프라이빗룸 + 노래방기기)</h4>
+                                <p class="text-sm text-slate-500 mt-1">호텔 투숙 및 휴식</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="day4" class="schedule-content hidden p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#ec4899] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">4일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">머드온천 · 루프탑 스테이크 · 야시장</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 호텔식</span>
+                                    <span class="bg-orange-50 text-orange-700 border border-orange-100 px-2 py-1 rounded">중: 현지식</span>
+                                    <span class="bg-rose-50 text-rose-700 border border-rose-100 px-2 py-1 rounded">석: 루프탑 스테이크</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 조식</h4>
+                            </div>
+                            <div class="relative bg-pink-50 p-5 rounded-2xl border border-pink-100">
+                                <div class="timeline-dot bg-pink-500 ring-pink-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-pink-500 text-white px-2 py-1 rounded inline-block mb-2">온천</span>
+                                <h4 class="font-bold text-lg text-slate-800">다낭 핫스프링 머드온천</h4>
+                                <p class="text-sm text-slate-600 mt-1">머드온천 + 워터파크 이용</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-orange-400 ring-orange-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">중식 — 현지식</h4>
+                            </div>
+                            <div class="relative bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                <div class="timeline-dot bg-rose-500 ring-rose-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-rose-500 text-white px-2 py-1 rounded inline-block mb-2">힐링</span>
+                                <h4 class="font-bold text-lg text-slate-800">전신마사지 90분</h4>
+                                <p class="text-sm text-slate-600 mt-1">※ 매너팁 불포함</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-indigo-500 ring-indigo-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">석식 — 다낭타워 루프탑 스테이크</h4>
+                                <p class="text-sm text-slate-500 mt-1">씨푸드 + 스테이크 세트</p>
+                            </div>
+                            <div class="relative bg-violet-50 p-5 rounded-2xl border border-violet-100">
+                                <div class="timeline-dot bg-violet-500 ring-violet-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-violet-500 text-white px-2 py-1 rounded inline-block mb-2">야경</span>
+                                <h4 class="font-bold text-lg text-slate-800">다낭 야시장 체험</h4>
+                                <p class="text-sm text-slate-600 mt-1">이후 호텔 이동 · 자유시간</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="day5" class="schedule-content hidden p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#8b5cf6] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">5일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">다낭 시내 — 린응사 · 성당 · 한강유람선</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 호텔식</span>
+                                    <span class="bg-orange-50 text-orange-700 border border-orange-100 px-2 py-1 rounded">중: 현지식</span>
+                                    <span class="bg-rose-50 text-rose-700 border border-rose-100 px-2 py-1 rounded">석: 삼겹살</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 조식</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-[#8b5cf6] ring-purple-100"></div>
+                                <div class="schedule-media">
+                                    <div class="schedule-desc">
+                                        <h4 class="font-bold text-lg text-slate-800">린응사 (영흥사 · 손짜반도)</h4>
+                                        <p class="text-sm text-slate-600 mt-2">화려한 색채와 조각이 돋보이는 사원 · 관음상</p>
+                                    </div>
+                                    <img src="assets/images/day2-linhung.jpg" alt="린응사" class="schedule-thumb">
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-pink-400 ring-pink-100"></div>
+                                <div class="schedule-media">
+                                    <div class="schedule-desc">
+                                        <h4 class="font-bold text-lg text-slate-800">다낭대성당 (핑크 성당)</h4>
+                                        <p class="text-sm text-slate-600 mt-2">중세 유럽풍 고딕 양식의 핑크빛 성당</p>
+                                    </div>
+                                    <img src="assets/images/day1-cathedral.jpg" alt="다낭대성당" class="schedule-thumb">
+                                </div>
+                            </div>
+                            <div class="relative bg-rose-50 p-5 rounded-2xl border border-rose-100">
+                                <div class="timeline-dot bg-rose-500 ring-rose-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-rose-500 text-white px-2 py-1 rounded inline-block mb-2">힐링</span>
+                                <h4 class="font-bold text-lg text-slate-800">전신마사지 90분</h4>
+                                <p class="text-sm text-slate-600 mt-1">※ 매너팁 불포함</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-amber-500 ring-amber-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">석식 — 삼겹살</h4>
+                            </div>
+                            <div class="relative bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                                <div class="timeline-dot bg-indigo-600 ring-indigo-100" style="left: -50px; top: 18px;"></div>
+                                <span class="text-xs font-bold bg-indigo-600 text-white px-2 py-1 rounded inline-block mb-2">야경</span>
+                                <h4 class="font-bold text-lg text-slate-800">한강 유람선 체험</h4>
+                                <p class="text-sm text-slate-600 mt-1">이후 호텔 투숙 · 휴식</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="day6" class="schedule-content hidden p-6 md:p-8">
+                        <div class="flex items-center gap-4 mb-8 border-b pb-5">
+                            <div class="bg-[#64748b] text-white text-xl font-bold w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm">6일</div>
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-800">다낭 → 인천 — 야간 귀국편</h3>
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs font-bold">
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">조: 호텔식</span>
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">중: 자유/개별</span>
+                                    <span class="bg-slate-100 text-slate-500 px-2 py-1 rounded">석: 기내식</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative border-l-2 border-slate-200 ml-4 pl-6 space-y-7">
+                            <div class="relative">
+                                <div class="timeline-dot bg-slate-400 ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">호텔 조식 · 체크아웃 · 자유시간</h4>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-tm ring-blue-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">다낭공항 이동 · 출국 수속</h4>
+                                <p class="text-sm text-slate-500 mt-1">온라인 체크인 완료 권장 (출발 24시간 전~1시간 전)</p>
+                            </div>
+                            <div class="relative">
+                                <div class="timeline-dot bg-[#64748b] ring-slate-100"></div>
+                                <h4 class="font-bold text-lg text-slate-800">23:15 다낭 출발 (9G0420) → 05:30(+1) 인천 도착</h4>
+                                <p class="text-sm text-slate-500 mt-1">약 4시간 15분 직항 · 인천 제1터미널</p>
+                                <p class="text-sm text-tm font-bold mt-2">일정은 항공·현지 상황에 따라 조정될 수 있습니다. 다음 여행도 투어메이커가 함께하겠습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hotel" class="py-16 bg-white border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <div class="text-center mb-12">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase"><i class="fa-solid fa-bed"></i> ACCOMMODATION</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-2">숙박 안내</h2>
+                </div>
+                <div class="bg-slate-50 rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                    <div class="md:flex">
+                        <div class="md:w-5/12 h-64 md:h-auto overflow-hidden">
+                            <img src="assets/images/hotel.jpg" alt="어웨이큰 다낭 호텔 전경" class="w-full h-full min-h-[280px] object-cover transform hover:scale-105 transition-transform duration-500">
+                        </div>
+                        <div class="md:w-7/12 p-6 md:p-10">
+                            <span class="bg-blue-100 text-tm text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">전일정 (5박) 숙박</span>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">어웨이큰 다낭 호텔</h3>
+                            <p class="text-sm text-slate-500 mb-6 font-medium">Awaken Danang Hotel · 5박</p>
+
+                            <ul class="text-sm text-slate-600 space-y-3">
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-star text-yellow-400 mt-1"></i> <div><strong>5성급 전일정 숙박</strong><br><span class="text-xs text-slate-500">현지 사정에 따라 변동될 수 있습니다.</span></div></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-location-dot text-rose-400 mt-1"></i> <div><strong>148 Vo Nguyen Giap, An Hai, Da Nang</strong><br><span class="text-xs text-slate-500">미케해변 인근 · 시내·해변 동선에 유리한 위치</span></div></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-phone text-blue-400 mt-1"></i> <div><strong>호텔 대표번호</strong><br><a href="tel:+842363956789" class="text-xs text-tm font-bold">+84-236-395-6789</a></div></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="smart-info" class="py-16 bg-slate-50 border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-6xl">
+                <div class="text-center mb-10">
+                    <span class="text-tm font-black tracking-widest text-xs uppercase"><i class="fa-solid fa-wand-magic-sparkles"></i> SMART ASSISTANT</span>
+                    <h2 class="text-3xl font-bold text-slate-800 mt-2">해외 스마트 여행비서</h2>
+                    <p class="text-sm text-slate-500 mt-2">투어메이커가 제공하는 실시간 맞춤형 현지 정보입니다.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl p-6 text-white shadow-md relative overflow-hidden flex flex-col justify-between lg:col-span-1">
+                        <div class="absolute -right-6 -top-6 text-white/10 text-9xl"><i class="fa-solid fa-cloud-sun"></i></div>
+                        <div>
+                            <div class="flex justify-between items-start relative z-10 mb-4">
+                                <h3 class="font-bold text-sm text-blue-100 flex items-center"><i class="fa-solid fa-location-dot mr-2"></i> 다낭 실시간 날씨</h3>
+                            </div>
+                            <div class="flex justify-between items-end relative z-10 mb-6">
+                                <div>
+                                    <span id="weather-temp" class="text-5xl font-black tracking-tighter">--°</span>
+                                    <p id="weather-desc" class="text-sm font-medium mt-1 text-blue-100">데이터 연동 중...</p>
+                                </div>
+                                <div id="weather-icon" class="text-6xl drop-shadow-md animate-bounce"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                            </div>
+                            <div id="clothing-rec-container" class="relative z-10 bg-white/20 rounded-xl p-3 mb-4 backdrop-blur-sm border border-white/20 text-xs font-medium text-white shadow-sm flex items-start gap-2">
+                                <i id="clothing-icon" class="fa-solid fa-shirt text-blue-200 mt-0.5"></i>
+                                <span id="clothing-desc" class="leading-relaxed">11월 다낭은 온화합니다. 얇은 긴팔과 자외선 차단을 준비하세요.</span>
+                            </div>
+                        </div>
+                        <div class="relative z-10 w-full overflow-hidden">
+                            <p class="text-[10px] font-bold text-blue-200 mb-2">7일 예보 (스크롤)</p>
+                            <div id="weekly-forecast" class="flex overflow-x-auto no-scrollbar gap-2 pb-2 border-t border-white/10 pt-3">
+                                <p class="text-xs text-white/50">불러오는 중...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-6 lg:col-span-2 hidden" aria-hidden="true">
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center gap-6 justify-between">
+                            <div class="w-full md:w-1/2">
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="font-bold text-slate-800 flex items-center"><i class="fa-solid fa-coins text-amber-500 mr-2"></i> 체감 환율 (VND)</h3>
+                                    <span class="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-1 rounded-full border border-rose-100">송금 수수료 1.5% 반영</span>
+                                </div>
+                                <div class="flex items-end gap-2 flex-wrap">
+                                    <span class="text-lg font-bold text-slate-600">10,000₫ = </span>
+                                    <span id="exchange-rate" class="text-4xl font-black text-tm tracking-tighter">---</span>
+                                    <span class="text-lg font-bold text-slate-600">원</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-2">참고용 · 현지 환전소·카드 수수료와 다를 수 있습니다.</p>
+                            </div>
+                            <div class="w-full md:w-1/2 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-xs text-slate-500 font-bold mb-2">빠른 계산기 (VND → KRW)</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="relative w-2/5">
+                                        <input type="number" id="vnd-input" disabled placeholder="100000" class="w-full bg-white border border-slate-200 text-slate-800 text-sm font-bold rounded-xl py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                        <span class="absolute right-2 top-2 text-xs font-bold text-slate-400">₫</span>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                                    <div class="w-3/5 text-right">
+                                        <span id="krw-output" class="text-xl font-bold text-slate-800">0</span>
+                                        <span class="text-sm font-medium text-slate-500"> 원</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                            <h3 class="font-bold text-slate-800 mb-4"><i class="fa-solid fa-tag text-emerald-500 mr-2"></i> 1:1 현지 물가 체감 비교 <span class="text-xs font-normal text-slate-400">(참고)</span></h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3" id="price-compare">
+                                <div class="text-center text-slate-400 py-4 col-span-full text-sm">물가 정보를 불러오는 중입니다...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-tm rounded-3xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <h3 class="font-bold text-2xl mb-2 flex items-center justify-center md:justify-start"><i class="fa-solid fa-comment-dots text-blue-300 mr-3"></i> 원클릭 생존 회화</h3>
+                        <p class="text-blue-100 text-sm leading-relaxed text-center md:text-left">식당, 쇼핑, 긴급 상황 시 당황하지 마세요.<br>베트남어 문장을 화면에 바로 보여줄 수 있습니다.</p>
+                    </div>
+                    <button onclick="openPhraseModal()" class="w-full md:w-auto shrink-0 bg-white text-tm font-bold py-3 px-8 rounded-xl shadow-md hover:bg-blue-50 transition-colors active:scale-95 text-lg">
+                        스마트 회화판 열기 <i class="fa-solid fa-arrow-pointer ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div id="phrase-modal" class="fixed inset-0 z-[100] hidden flex-col items-center justify-end bg-black/80 backdrop-blur-sm sm:justify-center px-4 no-print" onclick="closePhraseModal()">
+            <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+                <div class="bg-tm p-4 text-white flex justify-between items-center shrink-0">
+                    <h3 class="font-bold text-lg"><i class="fa-solid fa-language mr-2"></i> 베트남어 생존 회화</h3>
+                    <button onclick="closePhraseModal()" class="text-white/80 hover:text-white p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+                </div>
+                <div class="p-5 bg-slate-50 grid grid-cols-2 gap-3 overflow-y-auto custom-scrollbar">
+                    <button onclick="showPhrase('👋','안녕하세요','Xin chào','씬 짜오')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">👋</span><span class="text-sm font-bold text-slate-700">안녕하세요</span></button>
+                    <button onclick="showPhrase('🙏','감사합니다','Cảm ơn','깜 언')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">🙏</span><span class="text-sm font-bold text-slate-700">감사합니다</span></button>
+                    <button onclick="showPhrase('🚻','화장실 어딨나요?','Nhà vệ sinh ở đâu?','냐 베 신 어 다우?')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">🚻</span><span class="text-sm font-bold text-slate-700">화장실</span></button>
+                    <button onclick="showPhrase('💳','계산해 주세요','Tính tiền','띵 띠엔')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">💳</span><span class="text-sm font-bold text-slate-700">계산요청</span></button>
+                    <button onclick="showPhrase('🌶️','덜 맵게 해주세요','Ít cay','잇 까이')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">🌶️</span><span class="text-sm font-bold text-slate-700">덜 맵게</span></button>
+                    <button onclick="showPhrase('🧊','시원한 물 주세요','Cho tôi nước lạnh','쩌 또이 넉 라인')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">🧊</span><span class="text-sm font-bold text-slate-700">얼음물</span></button>
+                    <button onclick="showPhrase('📉','너무 비싸요','Đắt quá','닷 콰')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">📉</span><span class="text-sm font-bold text-slate-700">비싸요</span></button>
+                    <button onclick="showPhrase('👍','맛있어요','Ngon quá','넌 콰')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">👍</span><span class="text-sm font-bold text-slate-700">맛있음</span></button>
+                    <button onclick="showPhrase('📸','사진 찍어주세요','Chụp ảnh giúp tôi','춥 아잉 줍 또이')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-2 hover:bg-blue-50 transition-colors active:scale-95"><span class="text-3xl">📸</span><span class="text-sm font-bold text-slate-700">사진촬영</span></button>
+                    <button onclick="showPhrase('🚨','도와주세요! 병원이 필요해요','Cứu tôi! Cần bệnh viện','끄우 또이! 껀 벤 비엔')" class="bg-rose-50 p-4 rounded-xl border border-rose-200 shadow-sm flex flex-col items-center gap-2 hover:bg-rose-100 transition-colors active:scale-95"><span class="text-3xl">🚨</span><span class="text-sm font-bold text-rose-700">긴급상황</span></button>
+                </div>
+                <div id="phrase-display" class="hidden flex-col items-center p-6 bg-white border-t border-slate-200 shrink-0">
+                    <span id="p-emoji" class="text-6xl mb-3 drop-shadow-sm"></span>
+                    <p id="p-kr-meaning" class="text-lg font-bold text-slate-600 mb-2"></p>
+                    <div class="bg-blue-50 border border-blue-100 py-6 px-4 rounded-2xl w-full text-center mb-3">
+                        <p id="p-local" class="text-3xl font-black text-tm mb-2 break-keep"></p>
+                        <p id="p-prn" class="text-sm font-bold text-blue-500 bg-white px-3 py-1 rounded-full inline-block shadow-sm"></p>
+                    </div>
+                    <p class="text-xs text-rose-500 font-bold animate-pulse"><i class="fa-solid fa-mobile-screen mr-1"></i> 화면을 현지인에게 직접 보여주세요</p>
+                </div>
+            </div>
+        </div>
+
+        <section id="check" class="py-16 bg-white border-t border-slate-200">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <div class="text-center mb-10"><h2 class="text-3xl font-bold text-slate-800">베트남 맞춤 준비물 체크리스트</h2>
+                    <p class="text-sm text-slate-500 mt-2">다낭·호이안 우기·입국신고·시차를 반영했습니다. 체크 내용은 이 스마트폰에 저장됩니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-xl"><i class="fa-solid fa-check-double text-tm mr-2"></i>필수 준비물</h3>
+                            <button onclick="promptResetChecklist()" class="text-xs text-slate-400 hover:text-red-500 underline">초기화</button>
+                        </div>
+                        <div id="checklist-container" class="space-y-3"></div>
+                    </div>
+                    <div class="bg-yellow-50 p-8 rounded-3xl border border-yellow-200 flex flex-col shadow-sm">
+                        <h3 class="font-bold text-xl mb-6 text-yellow-800"><i class="fa-solid fa-pen-clip mr-2"></i>자유 메모장</h3>
+                        <textarea id="travel-memo" class="flex-1 w-full min-h-[250px] bg-white p-5 rounded-2xl border border-yellow-300 resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 text-sm leading-relaxed" placeholder="여권 번호, 방 번호, 쇼핑 리스트 등을 자유롭게 기록하세요. (자동 저장)"></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-16 bg-blue-50 border-t border-blue-100">
+            <div class="container mx-auto px-4 max-w-6xl">
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-slate-800">안심 비상 연락망</h2>
+                    <p class="text-sm text-slate-600 mt-2">여행 중 긴급 상황 시 즉시 문의해 주세요.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-tm text-white p-8 rounded-3xl shadow-md">
+                        <h4 class="font-bold text-xl mb-2">투어메이커 상황실</h4>
+                        <p class="text-xs text-blue-200 mb-6">담당 매니저 및 현지 가이드 연결</p>
+                        <div class="space-y-4">
+                            <div class="contact-row"><span class="contact-badge bg-white/20 text-white">담당</span><div><p class="font-bold">김효돈 이사</p><a href="tel:0335622551" class="text-sm font-bold text-blue-200 hover:text-white">033-562-2551</a></div></div>
+                            <div class="contact-row"><span class="contact-badge bg-white/20 text-white">현지</span><div><p class="font-bold">미정</p><a href="#contact" class="text-sm font-bold text-blue-200 hover:text-white">출발 전 안내</a></div></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-blue-100 shadow-md">
+                        <h4 class="font-bold text-xl text-rose-800 mb-5"><i class="fa-solid fa-building-columns mr-2"></i>주다낭 대한민국 총영사관</h4>
+                        <p class="text-sm font-bold text-slate-800 mb-1">근무시간 ☎ +84-23-6356-6100</p>
+                        <p class="text-sm font-bold text-rose-600">긴급 ☎ +84-93-112-0404</p>
+                        <p class="text-xs font-bold text-slate-800 mt-5 pt-5 border-t">영사콜센터 (24시간)</p>
+                        <p class="text-sm font-bold text-rose-600 mt-1">☎ +82-2-3210-0404</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="esg" class="py-16 bg-slate-800 text-white">
+            <div class="container mx-auto px-4 max-w-5xl">
+                <div class="flex flex-col md:flex-row items-center gap-10">
+                    <div class="md:w-5/12 text-center md:text-left">
+                        <div class="mb-4">
+                            <span class="inline-block bg-emerald-600 text-white text-xs px-4 py-1.5 rounded-full font-bold shadow-md"><i class="fa-solid fa-leaf mr-1"></i> ESG 실천 대시보드</span>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4 leading-tight">디지털 전환(DX)을 통한<br>친환경 여행 문화</h2>
+                        <p class="text-slate-300 text-sm leading-relaxed">본 행사는 스마트 가이드북 도입을 통해 종이 인쇄를 줄이고, 환경 보호 실천에 동참합니다.</p>
+                    </div>
+                    <div class="md:w-7/12 w-full">
+                        <div class="bg-amber-500/15 backdrop-blur rounded-3xl p-6 border border-amber-400/30 text-center shadow-lg max-w-xs mx-auto">
+                            <p class="text-amber-300 text-xs font-bold mb-2">📊 실시간 가이드북 열람</p>
+                            <p class="text-3xl font-black text-white"><span class="tm-view-count-val">--</span><span class="text-sm font-medium ml-1">회</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-100 pt-10 pb-20 text-center no-print border-t px-4">
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white rounded-3xl p-6 md:p-8 border border-blue-100 shadow-md mb-8 text-left md:text-center">
+                <div class="flex flex-wrap items-center justify-center gap-2 mb-3">
+                    <span class="inline-flex items-center gap-1.5 bg-blue-50 text-tm text-xs font-extrabold px-3 py-1 rounded-full border border-blue-200">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> TOURMAKER SMART GUIDEBOOK
+                    </span>
+                </div>
+                <h3 class="text-lg md:text-xl font-extrabold text-slate-800 mb-1.5">우리 모임 · 학교 · 기관도 스마트 가이드북으로 여행을 준비해 보세요</h3>
+                <p class="text-xs md:text-sm text-slate-500 leading-relaxed mb-5">맞춤 일정표, 실시간 도로 동선 지도, 체크리스트가 담긴 전용 웹 가이드북과 투명한 행정을 지원합니다.</p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" onclick="openTmInquiryModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-tm hover:bg-tm-dark text-white font-bold px-6 py-3.5 rounded-2xl shadow-md transition active:scale-95 text-sm">
+                        <i class="fa-solid fa-comments"></i> 투어메이커 맞춤 견적 · 상담 문의
+                    </button>
+                    <a href="https://tourmaker.kr/?utm_source=smart_guidebook&amp;utm_medium=footer_btn&amp;utm_campaign=270312_Danang" target="_blank" rel="noopener" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold px-5 py-3.5 rounded-2xl border border-slate-200 transition text-sm">
+                        투어메이커 홈페이지 <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="max-w-2xl mx-auto mb-5 px-4 py-3 rounded-xl bg-slate-200/70 border border-slate-300 text-[11px] text-slate-600 leading-relaxed text-left">
+                <p class="font-bold text-slate-800 mb-0.5">
+                    <i class="fa-solid fa-shield-halved text-[#004098] mr-1"></i> 지적재산권 보호 및 외부 유출 금지 안내
+                </p>
+                본 스마트 가이드북은 <strong>(주)투어메이커의 고유 지적재산</strong>입니다.
+                <strong class="tm-client-name">고객</strong> 전용 제안서·스마트 가이드북이며, 외부 유출 시 <strong>접속 IP 및 열람 횟수(현재 <span class="tm-view-count-val font-extrabold text-red-600">...</span>회)가 자동 기록</strong>됩니다.
+            </div>
+            <div class="pt-4 border-t border-slate-300/50">
+                <p class="text-[11px] font-black text-tm mb-2 tracking-wider">[System Powered by TOURMAKER]</p>
+                <p class="text-xs text-slate-500 font-medium leading-relaxed">본 스마트 가이드북은 투어메이커의 기획과 트래블 테크 기술 제휴로 제작되었습니다. · TM-270312-DANANG</p>
+                <p class="text-[11px] text-slate-700 font-medium mt-3 leading-relaxed">© 2026 이재명 · 투어메이커 스마트 가이드북 플랫폼<br><span class="font-bold text-[#004098]">한국저작권위원회 저작권 등록번호 C-2026-059022</span> (등록일 2026.11.12)</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="tm-inquiry-modal" class="fixed inset-0 z-[120] hidden items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-0 sm:px-4 no-print" onclick="closeTmInquiryModal()">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-100 animate-fade-in-up" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-[#004098] to-[#002d6b] p-5 text-white flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] font-extrabold tracking-widest uppercase text-sky-200 block">TOURMAKER CONSULTING DESK</span>
+                    <h3 class="font-bold text-lg mt-0.5">투어메이커 맞춤 여행 · 견적 문의</h3>
+                </div>
+                <button type="button" onclick="closeTmInquiryModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white" aria-label="닫기">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-3 bg-slate-50">
+                <a href="https://pf.kakao.com/_fxjxiQn/chat" target="_blank" rel="noopener" onclick="trackTmInquiry('kakao')" class="flex items-center justify-between p-4 rounded-2xl bg-[#FEE500] hover:brightness-95 text-slate-900 shadow-sm transition active:scale-[0.99]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-slate-900/10 flex items-center justify-center text-xl font-black">💬</div>
+                        <div class="text-left">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="font-extrabold text-sm">카카오톡 비즈니스 1:1 상담</span>
+                                <span class="text-[10px] font-extrabold bg-rose-600 text-white px-2 py-0.5 rounded-full">가장 추천</span>
+                                <span class="text-[10px] font-extrabold bg-slate-900 text-[#FEE500] px-2 py-0.5 rounded-full">조혁 이사 전담</span>
+                            </div>
+                            <p class="text-xs text-slate-800/80 mt-0.5">가장 빠른 상담 · 조혁 이사가 희망 여행지·인원·일정을 바로 응대합니다</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-700 text-xs"></i>
+                </a>
+
+                <button type="button" onclick="connectTmKakaoId()" class="w-full flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-amber-50 border border-amber-200 text-slate-800 shadow-sm transition active:scale-[0.99]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg"><i class="fa-solid fa-user-plus"></i></div>
+                        <div class="text-left">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="font-extrabold text-sm">이재명 대표 카톡 ID 친구추가</span>
+                                <span class="text-[10px] font-extrabold bg-amber-600 text-white px-2 py-0.5 rounded-full">inseodaeun</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">탭하면 ID가 복사됩니다 · 카카오톡에서 검색 후 친구추가</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-copy text-slate-400 text-xs"></i>
+                </button>
+
+                <a id="tm-sms-inquiry-link" href="sms:010-4249-4026" onclick="trackTmInquiry('sms')" class="flex items-center justify-between p-4 rounded-2xl bg-white hover:bg-sky-50 border border-sky-200 text-slate-800 shadow-sm transition active:scale-[0.99]">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-lg"><i class="fa-solid fa-comment-sms"></i></div>
+                        <div class="text-left">
+                            <span class="font-extrabold text-sm block">10초 문자(SMS) 간편 견적 문의</span>
+                            <p class="text-xs text-slate-500 mt-0.5">조혁 이사(010-4249-4026)에게 문의 양식이 자동 입력됩니다</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-400 text-xs"></i>
+                </a>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <a href="tel:010-4249-4026" onclick="trackTmInquiry('call_jo')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-emerald-700">현장·카톡·견적</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">조혁 이사</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-emerald-600"></i>010-4249-4026</p>
+                    </a>
+                    <a href="tel:010-9443-7881" onclick="trackTmInquiry('call_lee')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-tm">총괄·기획</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">이재명 대표</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-tm"></i>010-9443-7881</p>
+                    </a>
+                    <a href="tel:033-562-2551" onclick="trackTmInquiry('call_office')" class="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left shadow-sm transition">
+                        <p class="text-[10px] font-bold text-slate-500">사무실</p>
+                        <p class="font-extrabold text-sm text-slate-800 mt-0.5">투어메이커</p>
+                        <p class="text-[11px] font-bold text-slate-600 mt-1"><i class="fa-solid fa-phone mr-0.5 text-slate-500"></i>033-562-2551</p>
+                    </a>
+                </div>
+
+                <a href="https://tourmaker.kr/?utm_source=smart_guidebook&amp;utm_medium=inquiry_modal&amp;utm_campaign=270312_Danang" target="_blank" rel="noopener" onclick="trackTmInquiry('website')" class="flex items-center justify-between p-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-sm"><i class="fa-solid fa-globe text-sky-300"></i></div>
+                        <div class="text-left">
+                            <span class="font-bold text-sm block">투어메이커 공식 홈페이지 · 포트폴리오</span>
+                            <p class="text-[11px] text-slate-300 mt-0.5">tourmaker.kr · 대표전화 033-562-2551</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-xs text-slate-300"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-24 md:bottom-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full shadow-2xl z-[9999] transition-all duration-300 translate-y-20 opacity-0 no-print pointer-events-none text-sm font-bold flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-green-400"></i> <span id="toast-msg"></span>
+    </div>
+
+    <div id="custom-confirm" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4 no-print">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl text-center transform transition-transform">
+            <h3 class="text-xl font-bold mb-2 text-slate-800">초기화 확인</h3>
+            <p class="text-slate-600 text-sm mb-6">저장된 체크리스트를 초기화하시겠습니까?</p>
+            <div class="flex gap-3">
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-200">취소</button>
+                <button onclick="executeResetChecklist()" class="flex-1 bg-rose-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-rose-700">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="md:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 flex justify-around py-2 pb-safe z-50 text-[10px] text-slate-500 font-medium shadow-[0_-10px_20px_-5px_rgba(0,0,0,0.05)] no-print">
+        <a href="#home" class="flex flex-col items-center gap-1 p-2 text-tm"><i class="fa-solid fa-house text-xl mb-0.5"></i>홈</a>
+        <a href="#map-section" class="flex flex-col items-center gap-1 p-2"><i class="fa-solid fa-map-location-dot text-xl mb-0.5"></i>동선</a>
+        <a href="#schedule" class="flex flex-col items-center gap-1 p-2"><i class="fa-regular fa-calendar-days text-xl mb-0.5"></i>일정표</a>
+        <a href="#smart-info" class="flex flex-col items-center gap-1 p-2"><i class="fa-solid fa-wand-magic-sparkles text-xl mb-0.5"></i>여행비서</a>
+    </div>
+
+    <script>
+        function showToast(m){const t=document.getElementById('toast');document.getElementById('toast-msg').innerText=m;t.classList.remove('translate-y-20','opacity-0');setTimeout(()=>t.classList.add('translate-y-20','opacity-0'),3000);}
+
+        // 개발용 테스트. URL ?test_date=YYYY-MM-DD 가 TEST_DATE보다 우선.
+        const TEST_DATE = "";
+        const EVENT_DAYS = {
+            '2027-03-12': 'day1',
+            '2027-03-13': 'day2',
+            '2027-03-14': 'day3',
+            '2027-03-15': 'day4',
+            '2027-03-16': 'day5',
+            '2027-03-17': 'day6'
+        };
+        function getGuidebookToday() {
+            const q = new URLSearchParams(location.search).get('test_date');
+            if (q && /^\d{4}-\d{2}-\d{2}$/.test(q)) return q;
+            if (TEST_DATE) return TEST_DATE;
+            return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date());
+        }
+        function ymdDiffDays(a, b) {
+            const [ay, am, ad] = a.split('-').map(Number);
+            const [by, bm, bd] = b.split('-').map(Number);
+            return Math.round((Date.UTC(ay, am - 1, ad) - Date.UTC(by, bm - 1, bd)) / 86400000);
+        }
+        function getTodayDayKey() { return EVENT_DAYS[getGuidebookToday()] || null; }
+
+        function updateDday(){
+            const today = getGuidebookToday();
+            const start = '2027-03-12', end = '2026-11-16';
+            const badge = document.getElementById('d-day-badge'), hero = document.getElementById('hero-date');
+            if (!badge) return;
+            if (today < start) {
+                badge.className = 'bg-tm text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-sm animate-pulse';
+                badge.innerText = 'D-' + ymdDiffDays(start, today);
+            } else if (today <= end) {
+                const d = ymdDiffDays(today, start) + 1;
+                badge.className = 'bg-rose-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-sm animate-pulse';
+                badge.innerText = '📍 ' + d + '일차 진행중';
+                if (hero) {
+                    hero.innerHTML = '현재 다낭/호이안 여정의 ' + d + '일차가 진행 중입니다.';
+                    hero.className = 'text-base md:text-lg text-white font-bold bg-rose-500/80 inline-block px-6 py-2.5 rounded-2xl mt-4 backdrop-blur-sm shadow-xl tracking-wide';
+                }
+            } else {
+                badge.className = 'bg-slate-500 text-white text-[10px] px-3 py-1 rounded-full font-bold';
+                badge.innerText = '🏁 여정 종료';
+                if (hero) {
+                    hero.innerHTML = '모든 여정이 종료되었습니다. 좋은 추억으로 오래 간직되길 바랍니다.';
+                    hero.className = 'text-sm md:text-base text-slate-200 font-medium bg-slate-800/80 inline-block px-6 py-2.5 rounded-2xl mt-4 backdrop-blur-sm border border-slate-600 shadow-xl tracking-wide';
+                }
+            }
+        }
+        updateDday();
+
+        function isInAppBrowser() {
+            const ua = (navigator.userAgent || '').toLowerCase();
+            return /kakaotalk|naver|line\/|fbav|instagram|daumapps|everytimeapp|band\//.test(ua);
+        }
+        function handlePrint() {
+            if (isInAppBrowser()) {
+                alert('이 앱에서는 인쇄가 어려워요.\n다른 브라우저나 PC에서 열어 주세요.');
+                return;
+            }
+            window.print();
+        }
+
+        function goToTodaySchedule() {
+            const dayKey = getTodayDayKey();
+            if (dayKey) changeMapAndTab(dayKey);
+            document.getElementById('schedule')?.scrollIntoView({ behavior: 'smooth' });
+        }
+        function goToTodayRoute() {
+            const dayKey = getTodayDayKey();
+            if (dayKey) changeMapAndTab(dayKey);
+            document.getElementById('map-section')?.scrollIntoView({ behavior: 'smooth' });
+        }
+        function initEventDayUI() {
+            const bar = document.getElementById('event-day-bar');
+            if (!bar) return;
+            const dayKey = getTodayDayKey();
+            const isEventDay = !!dayKey;
+            bar.classList.toggle('hidden', !isEventDay);
+            document.body.classList.toggle('event-day', isEventDay);
+        }
+
+        let mapInited = false;
+        let currentMap = null;
+        let mapLayers = [];
+        let mapDrawSeq = 0;
+        let activeBus = null;
+        const osrmCache = {};
+        const spots = {
+            icn: { coords:[37.4602, 126.4407], title:'인천공항 T1', color:'#64748b', icon:'✈️' },
+            dad: { coords:[16.0439, 108.1990], title:'다낭공항', color:'#0ea5e9', icon:'🛬' },
+            hotel: { coords:[16.0758, 108.2446], title:'어웨이큰 호텔', color:'#004098', icon:'🏨' },
+            marble: { coords:[16.0036, 108.2640], title:'마블마운틴', color:'#f59e0b', icon:'⛰️' },
+            basket: { coords:[15.8920, 108.3380], title:'바스켓보트', color:'#f59e0b', icon:'🛶' },
+            hoian: { coords:[15.8801, 108.3380], title:'호이안 올드타운', color:'#f59e0b', icon:'🏮' },
+            banahills: { coords:[15.9977, 107.9881], title:'바나힐·황금손다리', color:'#10b981', icon:'🌉' },
+            hotspring: { coords:[15.9990, 108.2780], title:'머드온천', color:'#ec4899', icon:'♨️' },
+            tower: { coords:[16.0700, 108.2235], title:'다낭타워', color:'#ec4899', icon:'🥩' },
+            nightmarket: { coords:[16.0385, 108.2260], title:'다낭 야시장', color:'#ec4899', icon:'🌃' },
+            linhung: { coords:[16.1003, 108.2775], title:'린응사(영흥사)', color:'#8b5cf6', icon:'🙏' },
+            cathedral: { coords:[16.0678, 108.2208], title:'다낭성당', color:'#8b5cf6', icon:'⛪' },
+            hanriver: { coords:[16.0715, 108.2240], title:'한강 유람선', color:'#8b5cf6', icon:'🚢' }
+        };
+        const LEG_INFO = {
+            'icn>dad': { label: '9G0421 직항', time: '약 4시간 10분\n07:00 → 10:10' },
+            'dad>icn': { label: '9G0420 직항', time: '약 4시간 15분\n23:15 → 05:30(+1)' },
+            'hotel>marble': { time: '약 20분' },
+            'marble>basket': { time: '약 35분' },
+            'hoian>hotel': { time: '약 50분' },
+            'hotel>banahills': { time: '약 40분' },
+            'hotel>hotspring': { time: '약 25분' },
+            'hotel>linhung': { time: '약 20분' }
+        };
+        const HOME_KEYS = ['icn'];
+        const mapHints = {
+            all: '전체 여정 — 인천 ↔ 다낭 직항(점선) + 다낭·호이안·바나힐 전용차량 실제 도로 동선',
+            day1: '1일차 동선 — 인천공항 ✈️ 다낭공항 → 호텔(어웨이큰)',
+            day2: '2일차 동선 — 호텔 → 마블마운틴 → 바스켓보트 → 호이안 올드타운·야경 → 호텔',
+            day3: '3일차 동선 — 호텔 → 바나힐(황금손다리) → 호텔',
+            day4: '4일차 동선 — 호텔 → 머드온천 → 다낭타워 → 야시장 → 호텔',
+            day5: '5일차 동선 — 호텔 → 린응사 → 다낭성당 → 한강 유람선 → 호텔',
+            day6: '6일차 동선 — 호텔 → 다낭공항 ✈️ 인천공항 귀국'
+        };
+        const routes = {
+            all: {
+                points: ['icn','dad','hotel','marble','basket','hoian','banahills','hotspring','tower','nightmarket','linhung','cathedral','hanriver'],
+                maxZoom: 10,
+                lines: [
+                    { pts: ['icn','dad'], color: '#004098', mode: 'air' },
+                    { pts: ['dad','hotel'], color: '#0ea5e9' },
+                    { pts: ['hotel','marble','basket','hoian','hotel'], color: '#f59e0b' },
+                    { pts: ['hotel','banahills','hotel'], color: '#10b981' },
+                    { pts: ['hotel','hotspring','tower','nightmarket','hotel'], color: '#ec4899' },
+                    { pts: ['hotel','linhung','cathedral','hanriver','hotel'], color: '#8b5cf6' },
+                    { pts: ['hotel','dad'], color: '#64748b' },
+                    { pts: ['dad','icn'], color: '#64748b', mode: 'air' }
+                ]
+            },
+            day1: {
+                points: ['icn','dad','hotel'],
+                maxZoom: 13,
+                lines: [
+                    { pts: ['icn','dad'], color: '#004098', mode: 'air' },
+                    { pts: ['dad','hotel'], color: '#0ea5e9' }
+                ]
+            },
+            day2: {
+                points: ['hotel','marble','basket','hoian'],
+                maxZoom: 11,
+                lines: [{ pts: ['hotel','marble','basket','hoian','hotel'], color: '#f59e0b' }]
+            },
+            day3: {
+                points: ['hotel','banahills'],
+                maxZoom: 11,
+                lines: [{ pts: ['hotel','banahills','hotel'], color: '#10b981' }]
+            },
+            day4: {
+                points: ['hotel','hotspring','tower','nightmarket'],
+                maxZoom: 12,
+                lines: [{ pts: ['hotel','hotspring','tower','nightmarket','hotel'], color: '#ec4899' }]
+            },
+            day5: {
+                points: ['hotel','linhung','cathedral','hanriver'],
+                maxZoom: 12,
+                lines: [{ pts: ['hotel','linhung','cathedral','hanriver','hotel'], color: '#8b5cf6' }]
+            },
+            day6: {
+                points: ['hotel','dad','icn'],
+                maxZoom: 13,
+                lines: [
+                    { pts: ['hotel','dad'], color: '#64748b' },
+                    { pts: ['dad','icn'], color: '#004098', mode: 'air' }
+                ]
+            }
+        };
+
+        function isMobileView(){ return window.matchMedia('(max-width:768px)').matches; }
+        function pathMeters(path) {
+            let total = 0;
+            for (let i = 1; i < path.length; i++) total += L.latLng(path[i - 1]).distanceTo(L.latLng(path[i]));
+            return total;
+        }
+        function formatApproxKm(meters) {
+            if (!meters || meters <= 0) return '';
+            if (meters < 800) return '약 ' + Math.max(100, Math.round(meters / 100) * 100) + 'm';
+            const km = meters / 1000;
+            if (km < 10) return '약 ' + (Math.round(km * 2) / 2) + 'km';
+            if (km < 50) return '약 ' + Math.round(km) + 'km';
+            if (km < 400) return '약 ' + Math.round(km / 5) * 5 + 'km';
+            return '약 ' + (Math.round(km / 50) * 50).toLocaleString() + 'km';
+        }
+        function estimateSeconds(meters, mode) {
+            if (!meters || meters <= 0) return 0;
+            if (mode === 'air') return meters / (800 / 3.6);
+            return meters / (28 / 3.6);
+        }
+        function groupTravelSeconds(seconds, mode) {
+            if (!seconds || seconds <= 0) return 0;
+            if (mode === 'air') return seconds;
+            return Math.max(10 * 60, seconds * 1.3 + 8 * 60);
+        }
+        function formatApproxTime(seconds) {
+            if (!seconds || seconds <= 0) return '';
+            const min = Math.max(1, Math.ceil(seconds / 60));
+            if (min < 55) return '약 ' + Math.max(10, Math.ceil(min / 5) * 5) + '분';
+            const rounded = Math.ceil(min / 10) * 10;
+            const h = Math.floor(rounded / 60);
+            const m = rounded % 60;
+            if (!h) return '약 ' + m + '분';
+            if (!m) return '약 ' + h + '시간';
+            return '약 ' + h + '시간 ' + m + '분';
+        }
+        function setMapDistance(fromKey, toKey, meters, seconds, mode) {
+            const box = document.getElementById('map-distance');
+            const legEl = document.getElementById('map-distance-leg');
+            const timeEl = document.getElementById('map-distance-time');
+            const kmEl = document.getElementById('map-distance-km');
+            if (!box || !legEl || !timeEl || !kmEl) return;
+            const info = LEG_INFO[fromKey + '>' + toKey] || {};
+            const kmLabel = formatApproxKm(meters);
+            const timeLabel = info.time || formatApproxTime(groupTravelSeconds(seconds, mode));
+            if (!fromKey || (!kmLabel && !timeLabel)) {
+                box.classList.add('hidden');
+                return;
+            }
+            box.classList.remove('hidden');
+            legEl.textContent = spots[fromKey].title + ' → ' + spots[toKey].title + (info.label ? ' (' + info.label + ')' : '');
+            timeEl.textContent = timeLabel;
+            kmEl.textContent = kmLabel && mode === 'air' ? '항공 직선 ' + kmLabel : kmLabel;
+        }
+        function pinIcon(spot) {
+            return L.divIcon({
+                className: 'custom-icon',
+                html: `<div class="map-pin-wrap"><div class="map-pin-dot" style="background:${spot.color};">${spot.icon}</div><span class="map-pin-label">${spot.title}</span></div>`,
+                iconSize: [96, 52],
+                iconAnchor: [48, 16]
+            });
+        }
+        const PLANE_REST_DEG = 45;
+        const BUS_REST_DEG = 90;
+        function bearingDeg(from, to) {
+            const lat1 = from[0] * Math.PI / 180;
+            const lat2 = to[0] * Math.PI / 180;
+            const dLng = (to[1] - from[1]) * Math.PI / 180;
+            const y = Math.sin(dLng) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+        function headingPair(latlngs, i) {
+            const a = latlngs[Math.max(0, Math.min(i, latlngs.length - 1))];
+            let j = Math.min(Math.max(i + 1, 1), latlngs.length - 1);
+            while (j < latlngs.length - 1 && L.latLng(a).distanceTo(L.latLng(latlngs[j])) < 40) j++;
+            return [a, latlngs[j]];
+        }
+        function vehicleCssTransform(mode, from, to) {
+            if (!from || !to) return 'rotate(0deg)';
+            if (L.latLng(from).distanceTo(L.latLng(to)) < 8) return null;
+            const heading = bearingDeg(from, to);
+            const rest = mode === 'air' ? PLANE_REST_DEG : BUS_REST_DEG;
+            let rot = heading - rest;
+            while (rot > 180) rot -= 360;
+            while (rot < -180) rot += 360;
+            if (mode !== 'air' && Math.abs(rot) > 90) {
+                const flipRot = rot > 0 ? rot - 180 : rot + 180;
+                return `scaleX(-1) rotate(${flipRot}deg)`;
+            }
+            return `rotate(${rot}deg)`;
+        }
+        function vehicleIcon(mode, from, to) {
+            const emoji = mode === 'air' ? '✈️' : '🚌';
+            const transform = vehicleCssTransform(mode, from, to) || 'rotate(0deg)';
+            return L.divIcon({
+                className: 'custom-icon',
+                html: `<div class="map-bus" data-mode="${mode}" style="transform:${transform}">${emoji}</div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+        }
+        function applyVehicleHeading(marker, from, to, mode) {
+            if (!marker || !from || !to) return;
+            const transform = vehicleCssTransform(mode, from, to);
+            if (!transform) return;
+            const el = marker.getElement()?.querySelector('.map-bus');
+            if (el) el.style.transform = transform;
+        }
+        function clearMapLayers() {
+            if (activeBus) activeBus._aborted = true;
+            activeBus = null;
+            mapLayers.forEach(layer => {
+                if (layer._aborted !== undefined) layer._aborted = true;
+                currentMap.removeLayer(layer);
+            });
+            mapLayers = [];
+        }
+        async function roadPath(pts) {
+            const key = pts.map(p => p.join(',')).join('|');
+            if (osrmCache[key]) return osrmCache[key];
+            try {
+                const coords = pts.map(p => `${p[1]},${p[0]}`).join(';');
+                const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`);
+                const data = await res.json();
+                if (data.code === 'Ok' && data.routes && data.routes[0]) {
+                    const path = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+                    const packed = { path, meters: data.routes[0].distance, seconds: data.routes[0].duration };
+                    osrmCache[key] = packed;
+                    return packed;
+                }
+            } catch (e) { /* straight fallback */ }
+            const meters = pathMeters(pts);
+            return { path: pts, meters, seconds: estimateSeconds(meters, 'drive') };
+        }
+        function lineDuration(pixelLength, routeKey) {
+            const mobile = isMobileView();
+            const allView = routeKey === 'all';
+            const min = mobile ? (allView ? 1600 : 2800) : (allView ? 900 : 1400);
+            const max = mobile ? (allView ? 2800 : 5600) : (allView ? 1800 : 2800);
+            const pxPerMs = mobile ? (allView ? 0.22 : 0.12) : 0.28;
+            return Math.max(min, Math.min(max, pixelLength / pxPerMs));
+        }
+        function whenPathReady(polyline) {
+            return new Promise(resolve => {
+                let tries = 24;
+                const tick = () => {
+                    const el = polyline.getElement();
+                    if (el && typeof el.getTotalLength === 'function') resolve(el);
+                    else if (tries-- > 0) requestAnimationFrame(tick);
+                    else resolve(null);
+                };
+                requestAnimationFrame(tick);
+            });
+        }
+        function animateLine(polyline, duration) {
+            return new Promise(async resolve => {
+                const path = await whenPathReady(polyline);
+                if (!path) { resolve(duration); return; }
+                const length = path.getTotalLength();
+                const ms = duration || 1400;
+                path.style.transition = 'none';
+                path.style.strokeDasharray = length + ' ' + length;
+                path.style.strokeDashoffset = String(length);
+                path.getBoundingClientRect();
+                path.style.transition = `stroke-dashoffset ${ms}ms ease-in-out`;
+                path.style.strokeDashoffset = '0';
+                setTimeout(() => resolve(ms), ms + 40);
+            });
+        }
+        function moveMarkerAlong(marker, latlngs, duration, mode) {
+            return new Promise(resolve => {
+                if (!marker || !latlngs || latlngs.length < 2) { resolve(); return; }
+                const dists = [0];
+                let total = 0;
+                for (let i = 1; i < latlngs.length; i++) {
+                    total += L.latLng(latlngs[i - 1]).distanceTo(L.latLng(latlngs[i]));
+                    dists.push(total);
+                }
+                if (total === 0) { resolve(); return; }
+                const [h0a, h0b] = headingPair(latlngs, 0);
+                applyVehicleHeading(marker, h0a, h0b, mode);
+                const start = performance.now();
+                const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                function frame(now) {
+                    if (marker._aborted) { resolve(); return; }
+                    const t = Math.min(1, (now - start) / duration);
+                    const target = total * ease(t);
+                    let i = 1;
+                    while (i < dists.length && dists[i] < target) i++;
+                    const a = latlngs[i - 1];
+                    const b = latlngs[Math.min(i, latlngs.length - 1)];
+                    const span = (dists[i] - dists[i - 1]) || 1;
+                    const f = (target - dists[i - 1]) / span;
+                    marker.setLatLng([a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]);
+                    const [ha, hb] = headingPair(latlngs, i - 1);
+                    applyVehicleHeading(marker, ha, hb, mode || marker._mode || 'drive');
+                    if (t < 1) requestAnimationFrame(frame);
+                    else resolve();
+                }
+                requestAnimationFrame(frame);
+            });
+        }
+        function fitPath(path, maxZoom) {
+            return new Promise(resolve => {
+                if (!currentMap || !path || path.length < 2) { resolve(); return; }
+                const b = L.latLngBounds(path);
+                let done = false;
+                const finish = () => { if (done) return; done = true; currentMap.off('moveend', finish); resolve(); };
+                currentMap.once('moveend', finish);
+                currentMap.fitBounds(b.pad(0.18), { animate: true, duration: 0.7, maxZoom: maxZoom || 12, padding: [44, 44] });
+                setTimeout(finish, 850);
+            });
+        }
+        async function drawMap(routeKey) {
+            if (!currentMap) return;
+            const seq = ++mapDrawSeq;
+            clearMapLayers();
+            const routeData = routes[routeKey] || routes.all;
+            const hintEl = document.getElementById('map-hint');
+            if (hintEl) hintEl.textContent = mapHints[routeKey] || mapHints.all;
+            setMapDistance('', '', 0, 0);
+            const bounds = L.latLngBounds(routeData.points.map(key => spots[key].coords));
+            currentMap.fitBounds(bounds, { padding: [50, 50], maxZoom: routeData.maxZoom || 11 });
+            setTimeout(() => currentMap.invalidateSize(), 120);
+            const legs = [];
+            routeData.lines.forEach(lineDef => {
+                for (let i = 0; i < lineDef.pts.length - 1; i++) {
+                    legs.push({ from: lineDef.pts[i], to: lineDef.pts[i + 1], color: lineDef.color, mode: lineDef.mode || 'drive' });
+                }
+            });
+            const packed = await Promise.all(legs.map(async leg => {
+                if (leg.mode === 'air') {
+                    const path = [spots[leg.from].coords, spots[leg.to].coords];
+                    const meters = pathMeters(path);
+                    return { path, meters, seconds: estimateSeconds(meters, 'air') };
+                }
+                return roadPath([spots[leg.from].coords, spots[leg.to].coords]);
+            }));
+            if (seq !== mapDrawSeq) return;
+            const paths = packed.map(item => item.path);
+            await new Promise(r => setTimeout(r, 260));
+            if (seq !== mapDrawSeq) return;
+            paths.forEach((path, i) => {
+                const ghost = L.polyline(path, {
+                    color: '#94a3b8', weight: 3, opacity: 0.2,
+                    dashArray: legs[i].mode === 'air' ? '10,10' : null,
+                    lineJoin: 'round', lineCap: 'round'
+                }).addTo(currentMap);
+                mapLayers.push(ghost);
+            });
+            const placed = new Set();
+            const addPin = (key) => {
+                if (!key || placed.has(key)) return;
+                placed.add(key);
+                const spot = spots[key];
+                const marker = L.marker(spot.coords, { icon: pinIcon(spot), zIndexOffset: 200, keyboard: false })
+                    .addTo(currentMap)
+                    .bindTooltip(spot.title, { direction: 'top', offset: [0, -16] });
+                mapLayers.push(marker);
+            };
+            const legMaxZoom = (leg) => {
+                if (leg.mode === 'air') return 5;
+                if (routeKey === 'all') return 11;
+                return Math.max(routeData.maxZoom || 12, 11);
+            };
+            await fitPath(paths[0], legMaxZoom(legs[0]));
+            if (seq !== mapDrawSeq) return;
+            addPin(legs[0].from);
+            const firstLeg = legs[0];
+            const bus = L.marker(spots[firstLeg.from].coords, {
+                icon: vehicleIcon(firstLeg.mode, spots[firstLeg.from].coords, spots[firstLeg.to].coords),
+                zIndexOffset: 900, keyboard: false, interactive: false
+            }).addTo(currentMap);
+            bus._aborted = false;
+            bus._mode = firstLeg.mode;
+            activeBus = bus;
+            mapLayers.push(bus);
+            for (let i = 0; i < legs.length; i++) {
+                if (seq !== mapDrawSeq) return;
+                const leg = legs[i];
+                const path = paths[i];
+                const meters = packed[i].meters || pathMeters(path);
+                const seconds = packed[i].seconds || estimateSeconds(meters, leg.mode);
+                bus._mode = leg.mode;
+                bus.setIcon(vehicleIcon(leg.mode, spots[leg.from].coords, spots[leg.to].coords));
+                bus.setLatLng(path[0]);
+                setMapDistance(leg.from, leg.to, meters, seconds, leg.mode);
+                await fitPath(path, legMaxZoom(leg));
+                if (seq !== mapDrawSeq) return;
+                const poly = L.polyline(path, {
+                    color: leg.color, weight: leg.mode === 'air' ? 3 : 5, opacity: 0.95,
+                    dashArray: leg.mode === 'air' ? '10 8' : null,
+                    lineJoin: 'round', lineCap: 'round'
+                }).addTo(currentMap);
+                mapLayers.push(poly);
+                const ready = await whenPathReady(poly);
+                const ms = lineDuration(ready ? ready.getTotalLength() : 400, routeKey);
+                await Promise.all([animateLine(poly, ms), moveMarkerAlong(bus, path, ms, leg.mode)]);
+                if (seq !== mapDrawSeq) return;
+                if (ready) {
+                    ready.style.transition = 'none';
+                    ready.style.strokeDasharray = '';
+                    ready.style.strokeDashoffset = '';
+                }
+                addPin(leg.to);
+                await new Promise(r => setTimeout(r, isMobileView() ? 280 : 140));
+            }
+            if (seq !== mapDrawSeq) return;
+            if (bus && currentMap.hasLayer(bus)) currentMap.removeLayer(bus);
+            mapLayers = mapLayers.filter(layer => layer !== bus);
+            if (activeBus === bus) activeBus = null;
+            const finalKeys = routeData.points.filter(k => !HOME_KEYS.includes(k));
+            const overviewKeys = finalKeys.length ? finalKeys : routeData.points;
+            currentMap.fitBounds(L.latLngBounds(overviewKeys.map(k => spots[k].coords)), {
+                padding: [40, 40],
+                maxZoom: routeKey === 'all' ? 10 : Math.min(routeData.maxZoom || 12, 12),
+                animate: true
+            });
+            setTimeout(() => currentMap.invalidateSize(), 160);
+        }
+        function mapZoom(delta) {
+            if (!currentMap) return;
+            if (delta > 0) currentMap.zoomIn();
+            else currentMap.zoomOut();
+        }
+        window.mapZoom = mapZoom;
+        function showDayScheduleTab(dayId) {
+            const schedDay = (dayId && dayId !== 'all') ? dayId : 'day1';
+            document.querySelectorAll('.schedule-content').forEach(el => el.classList.add('hidden'));
+            const t = document.getElementById(schedDay);
+            if (t) { t.classList.remove('hidden'); t.classList.add('animate-fade-in-up'); }
+            document.querySelectorAll('.sched-tab').forEach(btn => {
+                btn.classList.remove('text-tm', 'border-b-2', 'border-tm');
+                btn.classList.add('text-slate-500');
+            });
+            document.querySelectorAll(`button[onclick="changeMapAndTab('${schedDay}')"]`).forEach(btn => {
+                if (btn.classList.contains('sched-tab')) {
+                    btn.classList.add('text-tm', 'border-b-2', 'border-tm');
+                    btn.classList.remove('text-slate-500');
+                }
+            });
+        }
+        function setMapBtnActive(dayId) {
+            document.querySelectorAll('.map-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-tm', 'text-white', 'border-tm', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-slate-600', 'border-slate-300');
+            });
+            const targetBtn = document.getElementById('btn-map-' + dayId);
+            if (targetBtn) {
+                targetBtn.classList.add('active', 'bg-tm', 'text-white', 'border-tm', 'shadow-sm');
+                targetBtn.classList.remove('bg-white', 'text-slate-600', 'border-slate-300');
+            }
+        }
+        function initMap(initialKey) {
+            if (mapInited || typeof L === 'undefined') return;
+            mapInited = true;
+            currentMap = L.map('map', { scrollWheelZoom: false, zoomControl: false });
+            if (typeof L.maplibreGL === 'function') {
+                L.maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron' }).addTo(currentMap);
+            } else {
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                    maxZoom: 19, attribution: 'Tiles © Esri'
+                }).addTo(currentMap);
+            }
+            const startKey = initialKey || getTodayDayKey() || (isMobileView() ? 'day1' : 'all');
+            setMapBtnActive(startKey);
+            if (startKey !== 'all') showDayScheduleTab(startKey);
+            drawMap(startKey);
+        }
+        async function changeMapAndTab(dayId) {
+            showDayScheduleTab(dayId);
+            setMapBtnActive(dayId);
+            if (!currentMap) { initMap(dayId); return; }
+            drawMap(dayId);
+        }
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { if (currentMap) currentMap.invalidateSize(); }, 200);
+        });
+        window.addEventListener('load', () => {
+            initMap();
+            initEventDayUI();
+        });
+
+        async function initLiveWidgets() {
+            const wEl = document.getElementById('weekly-forecast');
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=16.0544&longitude=108.2022&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FHo_Chi_Minh');
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                const code = data.current_weather.weathercode;
+
+                document.getElementById('weather-temp').innerText = temp + "°";
+
+                function getW(c) {
+                    if (c <= 3) return { i: "fa-sun", col: "text-yellow-300", d: "맑음/구름" };
+                    if (c >= 51 && c <= 67) return { i: "fa-cloud-rain", col: "text-blue-300", d: "비" };
+                    return { i: "fa-cloud", col: "text-slate-300", d: "흐림" };
+                }
+                const cur = getW(code);
+                document.getElementById('weather-icon').innerHTML = `<i class="fa-solid ${cur.i} ${cur.col}"></i>`;
+                document.getElementById('weather-desc').innerText = cur.d;
+                document.getElementById('weather-icon').classList.remove('animate-bounce');
+
+                let clo = "";
+                if (temp >= 28) clo = "더운 날씨입니다. 통풍되는 여름 옷차림과 자외선 차단제를 권장합니다.";
+                else if (temp >= 22) clo = "3월 다낭은 따뜻하고 건조한 편입니다. 반팔·얇은 긴팔과 자외선 차단을 준비하세요.";
+                else clo = "선선할 수 있습니다. 얇은 자켓이나 가디건을 챙기세요.";
+                document.getElementById('clothing-desc').innerText = clo;
+
+                const days = ['일','월','화','수','목','금','토'];
+                wEl.innerHTML = data.daily.time.slice(0,7).map((t, i) => {
+                    const d = new Date(t); const dn = i===0 ? '오늘' : days[d.getDay()];
+                    const info = getW(data.daily.weathercode[i]);
+                    return `<div class="flex flex-col items-center bg-white/10 px-3 py-2 rounded-xl min-w-[65px] border border-white/20 shrink-0"><span class="text-[10px] font-bold text-blue-100 mb-1">${dn}</span><i class="fa-solid ${info.i} ${info.col} mb-1"></i><div class="font-bold text-[10px]"><span class="text-blue-200">${Math.round(data.daily.temperature_2m_min[i])}°</span><span class="text-white/50 mx-0.5">/</span><span class="text-rose-200">${Math.round(data.daily.temperature_2m_max[i])}°</span></div></div>`;
+                }).join('');
+            } catch (e) {
+                wEl.innerHTML = '<p class="text-xs text-rose-200 p-2">날씨 정보를 불러오지 못했습니다.</p>';
+                document.getElementById('weather-icon').classList.remove('animate-bounce');
+            }
+
+            let krwPerVnd = 0.055;
+            try {
+                const rRes = await fetch('https://open.er-api.com/v6/latest/VND');
+                const rData = await rRes.json();
+                krwPerVnd = rData.rates.KRW * 1.015;
+            } catch(e){}
+            const per10k = Math.round(krwPerVnd * 10000);
+            document.getElementById('exchange-rate').innerText = per10k.toLocaleString();
+
+            const vndIn = document.getElementById('vnd-input'), krwOut = document.getElementById('krw-output');
+            function cKRW(v) { return (isNaN(v) || v < 0) ? "0" : Math.round(v * krwPerVnd).toLocaleString(); }
+            vndIn.addEventListener('input', (e) => krwOut.innerText = cKRW(parseFloat(e.target.value)));
+            krwOut.innerText = cKRW(100000);
+
+            const prices = [
+                { n: "카페 아메리카노", p: 45000, i: "fa-mug-hot", c: "text-amber-700" },
+                { n: "쌀국수(포) 1인", p: 50000, i: "fa-bowl-food", c: "text-orange-500" },
+                { n: "Grab 단거리", p: 40000, i: "fa-taxi", c: "text-emerald-600" },
+                { n: "생수 500ml", p: 10000, i: "fa-bottle-water", c: "text-blue-400" },
+                { n: "코코넛 1개", p: 25000, i: "fa-seedling", c: "text-green-600" }
+            ];
+            document.getElementById('price-compare').innerHTML = prices.map(p => `
+                <div class="flex justify-between items-center border-b border-slate-100 py-3 last:border-0">
+                    <div class="flex items-center gap-2"><i class="fa-solid ${p.i} w-4 text-center ${p.c}"></i><span class="text-sm font-bold text-slate-700">${p.n}</span></div>
+                    <div class="text-right"><span class="text-xs font-bold text-slate-400 mr-2">${p.p.toLocaleString()}₫</span><span class="font-black text-slate-800 text-sm">약 ${Math.round(p.p * krwPerVnd).toLocaleString()}원</span></div>
+                </div>
+            `).join('');
+        }
+        initLiveWidgets();
+
+        function openPhraseModal() { document.getElementById('phrase-modal').classList.remove('hidden'); document.getElementById('phrase-modal').classList.add('flex'); }
+        function closePhraseModal() { document.getElementById('phrase-modal').classList.add('hidden'); document.getElementById('phrase-modal').classList.remove('flex'); document.getElementById('phrase-display').classList.add('hidden'); }
+        function showPhrase(e, k, l, p) {
+            document.getElementById('p-emoji').innerText = e;
+            document.getElementById('p-kr-meaning').innerText = k;
+            document.getElementById('p-local').innerText = l;
+            document.getElementById('p-prn').innerText = p;
+            const d = document.getElementById('phrase-display');
+            d.classList.remove('hidden'); d.classList.add('flex');
+        }
+
+        const PAI_MEMO = `비자종류: 단방향면제 (Unilateral exemption)
+비자번호: 입력하지 않음 (빈칸)
+여행목적: Tourism (관광)
+국적: Korea (Republic of)
+입국항공: 9G0421
+입국일: 2027-03-12
+입국공항: Da Nang International Airport
+출발지: Incheon
+출국항공: 9G0420
+출국일: 2027-03-17
+호텔: AWAKEN DANANG HOTEL
+호텔주소: 148 Vo Nguyen Giap Street, An Hai Ward, Da Nang City, Vietnam
+숙소유형: Hotel
+도시: Da Nang
+
+※ 전자비자·비자·양자면제는 고르지 마세요. 이번 일정은 단방향면제만 해당합니다.`;
+        function copyPaiMemo(){
+            navigator.clipboard.writeText(PAI_MEMO).then(() => showToast('PAI 입력 메모가 복사되었습니다.')).catch(() => showToast('복사에 실패했습니다. 화면의 정보를 직접 입력해 주세요.'));
+        }
+
+        const C_KEY = 'tm_danang270312_chk_v1';
+        const C_ITEMS = [
+            '여권 원본 (귀국일 기준 유효기간 6개월 이상)',
+            '여권 사본 2부 (가방·객실 분리 보관)',
+            '사전입국신고(PAI) QR 저장 (투어메이커 전달 또는 개인 작성)',
+            '동(VND) 소액 환전 + 해외겸용 카드',
+            '마사지 매너팁 (일정 불포함 · 현장 안내)',
+            '편한 걷기 신발 (호이안 올드타운·마블마운틴)',
+            '3월 햇볕 대비 모자·선크림·가벼운 겉옷',
+            '반팔·얇은 긴팔 + 에어컨·차량용 겉옷',
+            '자외선 차단제·모자·선글라스 (미케·바나힐)',
+            '모기기피제 (바스켓보트·호이안 야외)',
+            '상비약·복용약·멀미약·지사제·방수밴드',
+            '세면도구 · 개인 위생용품',
+            '멀티 어댑터 (베트남 220V · A/C형)',
+            '보조배터리 (투명 지퍼백·절연테이프 / 기내 직접 휴대)',
+            '수영복·슬리퍼 (호텔 수영장·미케해변)',
+            '해외 로밍/eSIM · 카카오톡 비상연락 확인',
+            '여행자보험 증권(모바일) · 여정표 캡처',
+            '인천 T1 · 출발 최소 3시간 전 도착 (개별 수속)'
+        ];
+        function renderChecklist() {
+            const c = document.getElementById('checklist-container'), saved = JSON.parse(localStorage.getItem(C_KEY) || '{}');
+            c.innerHTML = C_ITEMS.map((l,i) => {
+                const id = 'chk_'+i;
+                return `<label class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3.5 cursor-pointer hover:bg-blue-50 transition-colors shadow-sm"><input type="checkbox" id="${id}" ${saved[id]?'checked':''} class="h-5 w-5 text-tm rounded border-slate-300 focus:ring-tm"><span class="text-sm font-bold text-slate-700">${l}</span></label>`;
+            }).join('');
+            c.querySelectorAll('input').forEach(cb => cb.addEventListener('change', () => {
+                const s = JSON.parse(localStorage.getItem(C_KEY) || '{}'); s[cb.id] = cb.checked; localStorage.setItem(C_KEY, JSON.stringify(s));
+            }));
+        }
+        renderChecklist();
+
+        function promptResetChecklist() { document.getElementById('custom-confirm').classList.remove('hidden'); document.getElementById('custom-confirm').classList.add('flex'); }
+        function closeConfirmModal() { document.getElementById('custom-confirm').classList.add('hidden'); document.getElementById('custom-confirm').classList.remove('flex'); }
+        function executeResetChecklist() { localStorage.removeItem(C_KEY); renderChecklist(); closeConfirmModal(); showToast('체크리스트가 초기화되었습니다.'); }
+
+        const m = document.getElementById('travel-memo'), M_KEY = 'tm_danang270312_memo';
+        if(m) { m.value = localStorage.getItem(M_KEY) || ''; m.addEventListener('input', () => localStorage.setItem(M_KEY, m.value)); }
+
+        function shareLink() {
+            const u = window.location.href;
+            if(navigator.share) navigator.share({title:'다낭·호이안 5박 6일 가이드북', url:u}).catch(()=>{});
+            else navigator.clipboard.writeText(u).then(() => showToast('주소가 복사되었습니다. 카카오톡에 붙여넣기 하세요!'));
+        }
+
+        const PRINT_FILENAME = '270312_다낭_일정표';
+        const PAGE_TITLE = document.title;
+        window.addEventListener('beforeprint', () => { document.title = PRINT_FILENAME; });
+        window.addEventListener('afterprint', () => { document.title = PAGE_TITLE; });
+
+        const TM_GUIDEBOOK_SLUG = '270312_Danang';
+        const TM_GUIDEBOOK_NAME = '다낭·호이안';
+        const TM_CLIENT_NAME = '고객'; // 무단공유 안내 [단체명] — 가이드북마다 여기만 바꾸면 됨
+        document.querySelectorAll('.tm-client-name').forEach((el) => { el.textContent = TM_CLIENT_NAME; });
+        const TM_KAKAO_ID = 'inseodaeun';
+        async function connectTmKakaoId() {
+            trackTmInquiry('kakao_id');
+            try {
+                await navigator.clipboard.writeText(TM_KAKAO_ID);
+                showToast('카톡 ID inseodaeun 복사됨 · 카카오톡에서 검색해 친구추가');
+            } catch (e) {
+                window.prompt('카톡 ID를 복사하세요', TM_KAKAO_ID);
+            }
+        }
+        function openTmInquiryModal() {
+            const m = document.getElementById('tm-inquiry-modal');
+            if (!m) return;
+            const smsLink = document.getElementById('tm-sms-inquiry-link');
+            if (smsLink) {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const body = encodeURIComponent(`[${TM_GUIDEBOOK_NAME} 가이드북 보고 문의드립니다]\n• 단체/모임명: \n• 희망 여행지: \n• 예상 인원 / 시기: `);
+                smsLink.href = `sms:010-4249-4026${isIOS ? '&' : '?'}body=${body}`;
+            }
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            trackTmInquiry('modal_open');
+        }
+        function closeTmInquiryModal() {
+            const m = document.getElementById('tm-inquiry-modal');
+            if (!m) return;
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+        function trackTmInquiry(action) {
+            try {
+                if (typeof gtag === 'function') {
+                    gtag('event', 'tm_guidebook_inquiry', {
+                        event_category: 'lead',
+                        event_label: `${TM_GUIDEBOOK_SLUG}_${action}`
+                    });
+                }
+            } catch (e) {}
+        }
+        async function initTmViewCounter() {
+            const els = document.querySelectorAll('.tm-view-count-val');
+            if (!els.length) return;
+            const hitKey = 'tm_hit_' + TM_GUIDEBOOK_SLUG;
+            const cacheKey = 'tm_cnt_' + TM_GUIDEBOOK_SLUG;
+            const alreadyHit = sessionStorage.getItem(hitKey);
+            let count = null;
+            try {
+                const mode = alreadyHit ? 'get' : 'hit';
+                const res = await fetch(`https://abacus.jasoncameron.dev/${mode}/tourmaker.kr/${TM_GUIDEBOOK_SLUG}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data.value === 'number') {
+                        count = data.value;
+                        sessionStorage.setItem(hitKey, '1');
+                    }
+                }
+            } catch (e) {}
+            if (count === null || count === 0) {
+                try {
+                    const res2 = await fetch(`https://tally.yuki.sh/hits/tourmaker/${TM_GUIDEBOOK_SLUG}.json${alreadyHit ? '?mode=read' : ''}`);
+                    if (res2.ok) {
+                        const data2 = await res2.json();
+                        if (typeof data2.visit === 'number') {
+                            count = data2.visit;
+                            sessionStorage.setItem(hitKey, '1');
+                        }
+                    }
+                } catch (e) {}
+            }
+            if (count !== null && count > 0) {
+                localStorage.setItem(cacheKey, String(count));
+            } else {
+                count = parseInt(localStorage.getItem(cacheKey) || '1', 10) || 1;
+            }
+            els.forEach(el => { el.textContent = count.toLocaleString(); });
+        }
+        initTmViewCounter();
+
+        // ==========================================
+        // [투어메이커] 지적재산권 콘솔 경고 + 도용 입증용 핑거프린트 트랩
+        // ==========================================
+        (function initTourmakerIpNotice() {
+            if (window.__TM_IP_NOTICE__) return;
+            window.__TM_IP_NOTICE__ = true;
+            try {
+                console.log(
+                    '%c⛔ TOURMAKER SMART GUIDEBOOK — 지적재산권 보호 문서',
+                    'color:#fff;background:#004098;font-weight:800;padding:10px 14px;border-radius:6px;font-size:13px;'
+                );
+                console.log(
+                    '%c본 문서의 HTML·CSS·JS 구조, UI/UX, 인쇄 레이아웃, ESG 대시보드, D-14 보안 잠금, 지도 동선, 문의 모달 등은 (주)투어메이커의 고유 저작물입니다.\n한국저작권위원회 저작권 등록번호 C-2026-059022 (등록일 2026.11.12)\n무단 복제·소스 도용·재배포·유사 서비스 제작 시 민·형사상 법적 조치가 진행될 수 있습니다.\n© 2026 이재명 · 투어메이커 · tourmaker.kr',
+                    'color:#004098;font-weight:600;line-height:1.7;font-size:12px;'
+                );
+            } catch (e) { /* ignore */ }
+
+            if (!document.querySelector('[data-tm-ip-trap="C-2026-059022"]')) {
+                const trap = document.createElement('div');
+                trap.className = 'tm-ip-fingerprint tm-sgb-core-v2026 tm-layout-signature';
+                trap.setAttribute('data-tm-ip-trap', 'C-2026-059022');
+                trap.setAttribute('data-tm-owner', 'tourmaker');
+                trap.setAttribute('data-tm-platform', 'smart-guidebook');
+                trap.setAttribute('aria-hidden', 'true');
+                trap.style.cssText = 'position:absolute;left:-99999px;top:auto;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none;';
+                trap.textContent = 'TOURMAKER_IP_PROTECTED_C-2026-059022';
+                (document.body || document.documentElement).appendChild(trap);
+            }
+        })();
+
+        // ==========================================
+        // [투어메이커] 경량 복사·우클릭 차단 + 스마트 보안 잠금
+        // 잠금: 출발 2주 전(D-14)보다 이전이면 MMDD 비번 요구 / D-14부터 자동 해제
+        // ==========================================
+        (function initSecurityShield() {
+            const isEditable = (el) => {
+                if (!el) return false;
+                const tag = (el.tagName || '').toUpperCase();
+                return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable;
+            };
+            document.addEventListener('contextmenu', (e) => {
+                if (isEditable(e.target)) return;
+                e.preventDefault();
+            });
+            document.addEventListener('selectstart', (e) => {
+                if (isEditable(e.target)) return;
+                e.preventDefault();
+            });
+            document.addEventListener('dragstart', (e) => {
+                if (isEditable(e.target)) return;
+                e.preventDefault();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (isEditable(e.target)) return;
+                const key = (e.key || '').toUpperCase();
+                const mod = e.ctrlKey || e.metaKey;
+                if (
+                    key === 'F12' ||
+                    (mod && e.shiftKey && ['I', 'J', 'C'].includes(key)) ||
+                    (mod && ['C', 'U', 'S'].includes(key))
+                ) {
+                    e.preventDefault();
+                    if (typeof showToast === 'function') {
+                        showToast('🔒 투어메이커 저작권 보호 문서로 복사 및 소스 열람이 제한됩니다.');
+                    }
+                }
+            });
+        })();
+
+        (function initSmartSecurityLock() {
+            const EVENT_START_DATE = Object.keys(EVENT_DAYS).sort()[0] || '2027-03-12';
+            const EVENT_END_DATE = Object.keys(EVENT_DAYS).sort().slice(-1)[0] || '2027-03-17';
+            const AUTO_PASS_MMDD = EVENT_START_DATE.slice(5, 7) + EVENT_START_DATE.slice(8, 10); // MMDD
+            const UNLOCK_DAYS_BEFORE = 14;
+            function unlockStorageKey(today) {
+                if (today > EVENT_END_DATE) return 'tm_unlocked_after_' + EVENT_END_DATE;
+                return 'tm_unlocked_' + EVENT_START_DATE;
+            }
+
+            function setLockVisible(on) {
+                const modal = document.getElementById('guidebook-lock-modal');
+                if (!modal) return;
+                modal.classList.toggle('hidden', !on);
+                modal.classList.toggle('flex', on);
+                document.documentElement.style.overflow = on ? 'hidden' : '';
+                document.body.style.overflow = on ? 'hidden' : '';
+            }
+
+            function shouldRequirePassword() {
+                const today = getGuidebookToday();
+                if (ymdDiffDays(EVENT_START_DATE, today) > UNLOCK_DAYS_BEFORE) return true;
+                if (today > EVENT_END_DATE) return true;
+                return false;
+            }
+
+            function checkLockCondition() {
+                const today = getGuidebookToday();
+                const unlocked = localStorage.getItem(unlockStorageKey(today)) === 'true';
+                if (shouldRequirePassword() && !unlocked) {
+                    setLockVisible(true);
+                    const input = document.getElementById('lock-password-input');
+                    if (input) setTimeout(() => input.focus(), 80);
+                } else {
+                    setLockVisible(false);
+                }
+            }
+
+            window.verifyGuidebookPassword = function () {
+                const inputEl = document.getElementById('lock-password-input');
+                const errorMsg = document.getElementById('lock-error-msg');
+                const inputVal = (inputEl?.value || '').trim();
+                if (inputVal === AUTO_PASS_MMDD) {
+                    localStorage.setItem(unlockStorageKey(getGuidebookToday()), 'true');
+                    if (errorMsg) errorMsg.classList.add('hidden');
+                    setLockVisible(false);
+                    if (typeof showToast === 'function') {
+                        showToast('🔓 인증되었습니다. 가이드북을 열람합니다.');
+                    }
+                } else {
+                    if (errorMsg) errorMsg.classList.remove('hidden');
+                    if (inputEl) {
+                        inputEl.classList.add('border-rose-500', 'shake');
+                        setTimeout(() => inputEl.classList.remove('border-rose-500', 'shake'), 500);
+                        inputEl.select();
+                    }
+                }
+            };
+
+            document.getElementById('lock-password-input')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    window.verifyGuidebookPassword();
+                }
+            });
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkLockCondition);
+            } else {
+                checkLockCondition();
+            }
+        })();
+    </script>
+</body>
+</html>
